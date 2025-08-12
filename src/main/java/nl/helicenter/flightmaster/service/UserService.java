@@ -3,8 +3,10 @@ package nl.helicenter.flightmaster.service;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -31,4 +33,10 @@ public class UserService {
         userRepository.save(user);
         return user.getEmail();
     }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+
 }
