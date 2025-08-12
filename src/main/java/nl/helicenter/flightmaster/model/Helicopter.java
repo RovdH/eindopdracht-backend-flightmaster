@@ -10,6 +10,9 @@ public class Helicopter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @Column(unique = true, nullable = false)
+    private String callSign;
+
     private String type;
     private int capacity;
     private double fuelCapacity;
@@ -25,6 +28,14 @@ public class Helicopter {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCallSign() {
+        return callSign;
+    }
+
+    public void setCallSign(String callSign) {
+        this.callSign = callSign;
     }
 
     public String getType() {
