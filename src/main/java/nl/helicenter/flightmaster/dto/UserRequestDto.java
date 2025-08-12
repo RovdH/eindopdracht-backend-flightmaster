@@ -1,33 +1,21 @@
-package nl.helicenter.flightmaster.model;
+package nl.helicenter.flightmaster.dto;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
-@Entity
-@Table(name = "users")
-public class User {
+public class UserRequestDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
+    @NotBlank(message = "Email is verplicht")
+    @Email(message = "Ongeldig e-mailadres")
     private String email;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Wachtwoord is verplicht")
     private String password;
 
-    private String role; // "USER", "ADMIN", "PILOT"
+    @NotBlank(message = "Rol is verplicht")
+    private String role;
 
-    public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // Getters en setters
 
     public String getEmail() {
         return email;
