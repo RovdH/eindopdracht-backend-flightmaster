@@ -1,5 +1,6 @@
 package nl.helicenter.flightmaster.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import nl.helicenter.flightmaster.dto.HelicopterRequestDto;
 import nl.helicenter.flightmaster.dto.HelicopterResponseDto;
 import nl.helicenter.flightmaster.model.Helicopter;
@@ -40,7 +41,7 @@ public class HelicopterService {
 
     public HelicopterResponseDto getHelicopterById(Long id) {
         Helicopter helicopter = helicopterRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Helicopter met id " + id + " niet gevonden."));
+                .orElseThrow(() -> new EntityNotFoundException("Helicopter met id " + id + " niet gevonden."));
         return mapToResponseDto(helicopter);
     }
 
