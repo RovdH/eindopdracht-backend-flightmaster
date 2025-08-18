@@ -11,7 +11,7 @@ import java.util.List;
 public class EventRequestDto {
 
     @NotNull(message = "Datum van het event is verplicht")
-    private LocalDate date;
+    private LocalDate eventDate;
 
     @NotBlank(message = "Locatie is verplicht")
     private String location;
@@ -24,11 +24,11 @@ public class EventRequestDto {
 
     // Getters en setters
     public LocalDate getDate() {
-        return date;
+        return eventDate;
     }
 
     public void setDate(LocalDate date) {
-        this.date = date;
+        this.eventDate = date;
     }
 
     public String getLocation() {

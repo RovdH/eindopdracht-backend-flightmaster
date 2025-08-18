@@ -14,7 +14,7 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
+    private LocalDate eventDate;
 
     private String location;
 
@@ -39,11 +39,11 @@ public class Event {
     }
 
     public LocalDate getDate() {
-        return date;
+        return eventDate;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
     }
 
     public String getLocation() {
