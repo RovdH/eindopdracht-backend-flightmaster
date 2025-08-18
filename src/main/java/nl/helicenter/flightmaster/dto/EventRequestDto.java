@@ -1,11 +1,10 @@
 package nl.helicenter.flightmaster.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class EventRequestDto {
@@ -19,16 +18,33 @@ public class EventRequestDto {
     @Positive(message = "Vliegtijd moet groter zijn dan 0")
     private double flightTime;
 
+    @JsonFormat(pattern = "HH:mm")
+    @NotNull(message = "Starttijd is verplicht en moet in HH:mm formaat zijn")
+    @NotNull(message = "Starttijd is verplicht")
+    private LocalTime startTime;
+
+    @JsonFormat(pattern = "HH:mm")
+    @NotNull(message = "Eindtijd is verplicht en moet in HH:mm formaat zijn")
+    private LocalTime endTime;
+
+    @AssertTrue(message = "Eindtijd moet later zijn dan starttijd")
+    public boolean isValidTimeWindow() {
+        if (startTime == null || endTime == null) {
+            return true;
+        }
+        return endTime.isAfter(startTime);
+    }
+
     @NotEmpty(message = "Minimaal één helikopter is vereist")
     private List<Long> helicopterIds;
 
-    // Getters en setters
+
     public LocalDate getDate() {
         return eventDate;
     }
 
-    public void setDate(LocalDate date) {
-        this.eventDate = date;
+    public void setDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
     }
 
     public String getLocation() {
@@ -47,6 +63,22 @@ public class EventRequestDto {
         this.flightTime = flightTime;
     }
 
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
     public List<Long> getHelicopterIds() {
         return helicopterIds;
     }
@@ -54,4 +86,5 @@ public class EventRequestDto {
     public void setHelicopterIds(List<Long> helicopterIds) {
         this.helicopterIds = helicopterIds;
     }
+
 }

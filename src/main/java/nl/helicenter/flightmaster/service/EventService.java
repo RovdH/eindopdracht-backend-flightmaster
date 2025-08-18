@@ -31,7 +31,7 @@ public class EventService {
         }
 
          for (Helicopter heli : helicopters) {
-            boolean conflict = eventRepository.existsByDateAndHelicopters_Id(dto.getDate(), heli.getId());
+            boolean conflict = eventRepository.existsByEventDateAndHelicopters_Id(dto.getDate(), heli.getId());
             if (conflict) {
                 throw new IllegalArgumentException("Helicopter " + heli.getCallSign() + " is al geboekt op " + dto.getDate());
             }
@@ -41,6 +41,8 @@ public class EventService {
         event.setDate(dto.getDate());
         event.setLocation(dto.getLocation());
         event.setFlightTime(dto.getFlightTime());
+        event.setStartTime(dto.getStartTime());
+        event.setEndTime(dto.getEndTime());
         event.setHelicopters(helicopters);
 
         Event saved = eventRepository.save(event);
@@ -66,6 +68,8 @@ public class EventService {
         dto.setDate(event.getDate());
         dto.setLocation(event.getLocation());
         dto.setFlightTime(event.getFlightTime());
+        dto.setStartTime(event.getStartTime());
+        dto.setEndTime(event.getEndTime());
         dto.setHelicopterCallSigns(
                 event.getHelicopters().stream()
                         .map(Helicopter::getCallSign)

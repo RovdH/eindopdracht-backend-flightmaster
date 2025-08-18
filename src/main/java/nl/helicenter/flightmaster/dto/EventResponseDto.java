@@ -1,6 +1,7 @@
 package nl.helicenter.flightmaster.dto;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class EventResponseDto {
@@ -9,7 +10,8 @@ public class EventResponseDto {
     private LocalDate eventDate;
     private String location;
     private double flightTime;
-
+    private LocalTime startTime;
+    private LocalTime endTime;
     private List<String> helicopterCallSigns;
 
     public Long getId() {
@@ -43,7 +45,21 @@ public class EventResponseDto {
     public void setFlightTime(double flightTime) {
         this.flightTime = flightTime;
     }
+    public LocalTime getStartTime() {
+        return startTime;
+    }
 
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
     public List<String> getHelicopterCallSigns() {
         return helicopterCallSigns;
     }

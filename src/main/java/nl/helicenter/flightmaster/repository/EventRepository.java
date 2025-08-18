@@ -7,5 +7,5 @@ import java.time.LocalDate;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    boolean existsByDateAndHelicopters_Id(LocalDate eventDate, Long helicopterId);
+    boolean existsByEventDateAndHelicopters_Id(LocalDate eventDate, Long helicopterId);
 }

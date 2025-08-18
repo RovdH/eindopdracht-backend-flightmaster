@@ -7,7 +7,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import jakarta.persistence.EntityNotFoundException;
+
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,4 +47,9 @@ public class RestExceptionHandler {
                 .body(Map.of("error", "Waarde bestaat al of is ongeldig. Mogelijk dubbele vermelding."));
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleJsonParseError(HttpMessageNotReadableException ex) {
+        String message = "Ongeldig formaat in JSON. Controleer dat tijden in HH:mm formaat zijn.";
+        return ResponseEntity.badRequest().body(Map.of("error", message));
+    }
 }

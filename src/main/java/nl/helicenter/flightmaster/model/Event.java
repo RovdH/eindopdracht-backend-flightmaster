@@ -3,6 +3,7 @@ package nl.helicenter.flightmaster.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +14,10 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private LocalTime startTime;
+    private LocalTime endTime;
     private LocalDate eventDate;
-
     private String location;
-
     private double flightTime;
 
     @ManyToMany
@@ -44,6 +44,22 @@ public class Event {
 
     public void setDate(LocalDate eventDate) {
         this.eventDate = eventDate;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
     public String getLocation() {
