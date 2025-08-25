@@ -52,14 +52,15 @@ public class FlightService {
                 flightRepository.findTopByEvent_IdAndHelicopter_IdOrderByStartTimeDesc(event.getId(), heli.getId());
 
         if (prevFlightOpt.isEmpty()) {
-              start = event.getStartTime();
+            start = event.getStartTime();
             fuelBefore = heli.getFuelCapacity();
         } else {
             Flight prevFlight = prevFlightOpt.get();
             start = prevFlight.getStartTime().plusMinutes((long) event.getFlightTime());
             fuelBefore = prevFlight.getFuelAfter();
 
-            double consumptionPerFlight = event.getFlightTime() * heli.getFuelUsage();
+            double minutes = event.getFlightTime();
+            double consumptionPerFlight = (heli.getFuelUsage() / 60.0) * minutes;
 
             if (fuelBefore - consumptionPerFlight < FUEL_RESERVE) {
                 start = start.plusMinutes(REFUEL_MINUTES);
@@ -72,7 +73,8 @@ public class FlightService {
             throw new IllegalArgumentException("Geen ruimte meer binnen het eventvenster voor een extra vlucht.");
         }
 
-        double consumptionPerFlight = event.getFlightTime() * heli.getFuelUsage();
+        double minutes = event.getFlightTime();
+        double consumptionPerFlight = (heli.getFuelUsage() / 60.0) * minutes;
         fuelAfter = fuelBefore - consumptionPerFlight;
 
         long idx = flightRepository.countByEvent_Id(event.getId()) + 1;
