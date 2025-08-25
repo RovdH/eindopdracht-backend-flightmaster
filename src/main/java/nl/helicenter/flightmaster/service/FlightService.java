@@ -106,7 +106,8 @@ public class FlightService {
 
     public List<FlightResponseDto> getAll() {
         return flightRepository.findAll()
-                .stream().map(this::mapToResponse)
+                .stream()
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
