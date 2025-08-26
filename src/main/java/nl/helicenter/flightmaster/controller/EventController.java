@@ -30,6 +30,11 @@ public class EventController {
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(created);
     }
 
+    @PostMapping
+    public ResponseEntity<List<FlightResponseDto>> generate(@PathVariable("id") Long eventId,@RequestParam(defaultValue = "true") boolean reset) {
+        ResponseEntity.status(201).body(flightService.generateFlightSchedule(eventId, reset));
+    }
+
     @GetMapping
     public ResponseEntity<List<EventResponseDto>> getAll() {
         return ResponseEntity.ok(eventService.getAll());

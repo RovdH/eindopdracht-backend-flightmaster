@@ -12,6 +12,7 @@ import nl.helicenter.flightmaster.repository.HelicopterRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,8 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class FlightService {
 
-    private static final double FUEL_RESERVE = 30.0;
-    private static final int REFUEL_MINUTES = 30;
+    private static final double FUEL_RESERVE = 30.0; // liters
+    private static final int REFUEL_MINUTES = 30;    // minutes
 
     private final FlightRepository flightRepository;
     private final EventRepository eventRepository;
@@ -33,7 +34,8 @@ public class FlightService {
         this.eventRepository = eventRepository;
         this.helicopterRepository = helicopterRepository;
     }
-
+    
+    
     public FlightResponseDto create(FlightRequestDto dto) {
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event " + dto.getEventId() + " niet gevonden."));
@@ -44,63 +46,45 @@ public class FlightService {
             throw new IllegalArgumentException("Helicopter " + heli.getCallSign() + " is niet toegewezen aan event " + event.getId());
         }
 
-        LocalTime start;
-        double fuelBefore;
-        double fuelAfter;
+        return generateFlightSlot(event, heli)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new IllegalArgumentException("Geen ruimte meer binnen het eventvenster voor een extra vlucht."));
+    }
 
-        Optional<Flight> prevFlightOpt =
-                flightRepository.findTopByEvent_IdAndHelicopter_IdOrderByStartTimeDesc(event.getId(), heli.getId());
+    public List<FlightResponseDto> generateFlightSchedule(Long eventId, boolean reset) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event " + eventId + " niet gevonden."));
+        if (event.getHelicopters() == null || event.getHelicopters().isEmpty()) {
+            throw new IllegalArgumentException("Geen helikopters toegewezen aan event " + eventId);
+        }
+        if (reset) {
+            flightRepository.deleteByEvent_Id(eventId);
+        }
 
-        if (prevFlightOpt.isEmpty()) {
-            start = event.getStartTime();
-            fuelBefore = heli.getFuelCapacity();
-        } else {
-            Flight prevFlight = prevFlightOpt.get();
-            start = prevFlight.getStartTime().plusMinutes((long) event.getFlightTime());
-            fuelBefore = prevFlight.getFuelAfter();
-
-            double minutes = event.getFlightTime();
-            double consumptionPerFlight = (heli.getFuelUsage() / 60.0) * minutes;
-
-            if (fuelBefore - consumptionPerFlight < FUEL_RESERVE) {
-                start = start.plusMinutes(REFUEL_MINUTES);
-                fuelBefore = heli.getFuelCapacity();
+        List<FlightResponseDto> created = new java.util.ArrayList<>();
+        for (Helicopter heli : event.getHelicopters()) {
+            while (true) {
+                Optional<Flight> planned = generateFlightSlot(event, heli);
+                if (planned.isEmpty()) break;
+                created.add(mapToResponse(planned.get()));
             }
         }
 
-        LocalTime endCandidate = start.plusMinutes((long) event.getFlightTime());
-        if (start.isBefore(event.getStartTime()) || endCandidate.isAfter(event.getEndTime())) {
-            throw new IllegalArgumentException("Geen ruimte meer binnen het eventvenster voor een extra vlucht.");
-        }
-
-        double minutes = event.getFlightTime();
-        double consumptionPerFlight = (heli.getFuelUsage() / 60.0) * minutes;
-        fuelAfter = fuelBefore - consumptionPerFlight;
-
-        long idx = flightRepository.countByEvent_Id(event.getId()) + 1;
-        String flightNumber = "FL" + idx;
-
-        Flight f = new Flight();
-        f.setEvent(event);
-        f.setHelicopter(heli);
-        f.setFlightNumber(flightNumber);
-        f.setStartTime(start);
-        f.setFuelBefore(fuelBefore);
-        f.setFuelAfter(fuelAfter);
-
-        Flight saved = flightRepository.save(f);
-        return mapToResponse(saved);
+        created.sort(Comparator.comparing(FlightResponseDto::getStartTime)
+                .thenComparing(FlightResponseDto::getHelicopterCallSign));
+        return created;
     }
 
     public FlightResponseDto getById(Long id) {
-        Flight f = flightRepository.findById(id)
+        Flight flight = flightRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Flight " + id + " niet gevonden."));
-        return mapToResponse(f);
+        return mapToResponse(flight);
     }
 
     public List<FlightResponseDto> getByEvent(Long eventId) {
         return flightRepository.findByEvent_Id(eventId)
-                .stream().map(this::mapToResponse)
+                .stream()
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -111,16 +95,60 @@ public class FlightService {
                 .collect(Collectors.toList());
     }
 
-    private FlightResponseDto mapToResponse(Flight f) {
+    // helper voor dubbel gebruik 
+
+    private Optional<Flight> generateFlightSlot(Event event, Helicopter heli) {
+
+        Optional<Flight> prevFlightOpt =
+                flightRepository.findTopByEvent_IdAndHelicopter_IdOrderByStartTimeDesc(event.getId(), heli.getId());
+
+        LocalTime start = prevFlightOpt
+                .map(flight -> flight.getStartTime().plusMinutes((long) event.getFlightTime()))
+                .orElse(event.getStartTime());
+
+        double fuelBefore = prevFlightOpt
+                .map(Flight::getFuelAfter)
+                .orElse(heli.getFuelCapacity());
+
+
+        double minutes = event.getFlightTime();
+        double consumptionPerFlight = (heli.getFuelUsage() / 60.0) * minutes;
+
+
+        if (fuelBefore - consumptionPerFlight < FUEL_RESERVE) {
+            start = start.plusMinutes(REFUEL_MINUTES);
+            fuelBefore = heli.getFuelCapacity();
+        }
+        
+        LocalTime calcEndTime = start.plusMinutes((long) minutes);
+        if (start.isBefore(event.getStartTime()) || calcEndTime.isAfter(event.getEndTime())) {
+            return Optional.empty();
+        }
+        
+        long idx = flightRepository.countByEvent_Id(event.getId()) + 1;
+        String flightNumber = "FL" + idx;
+        
+        Flight flight = new Flight();
+        flight.setEvent(event);
+        flight.setHelicopter(heli);
+        flight.setFlightNumber(flightNumber);
+        flight.setStartTime(start);
+        flight.setFuelBefore(fuelBefore);
+        flight.setFuelAfter(fuelBefore - consumptionPerFlight);
+
+        return Optional.of(flightRepository.save(flight));
+    }
+
+    private FlightResponseDto mapToResponse(Flight flight) {
         FlightResponseDto dto = new FlightResponseDto();
-        dto.setId(f.getId());
-        dto.setFlightNumber(f.getFlightNumber());
-        dto.setStartTime(f.getStartTime());
-        dto.setEndTime(f.getStartTime().plusMinutes((long) f.getEvent().getFlightTime()));
-        dto.setEventId(f.getEvent().getId());
-        dto.setHelicopterCallSign(f.getHelicopter().getCallSign());
-        dto.setFuelBefore(f.getFuelBefore());
-        dto.setFuelAfter(f.getFuelAfter());
+        dto.setId(flight.getId());
+        dto.setFlightNumber(flight.getFlightNumber());
+        dto.setStartTime(flight.getStartTime());
+        dto.setEndTime(flight.getStartTime().plusMinutes((long) flight.getEvent().getFlightTime()));
+        dto.setEventId(flight.getEvent().getId());
+        dto.setHelicopterCallSign(flight.getHelicopter().getCallSign());
+        dto.setFuelBefore(flight.getFuelBefore());
+        dto.setFuelAfter(flight.getFuelAfter());
         return dto;
     }
 }

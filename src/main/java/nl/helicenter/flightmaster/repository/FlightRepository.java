@@ -14,7 +14,10 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     boolean existsByEvent_IdAndFlightNumber(Long eventId, String flightNumber);
     boolean existsByEvent_IdAndHelicopter_IdAndStartTime(Long eventId, Long helicopterId, LocalTime startTime);
 
+
+    Optional<Flight> findByEvent_IdAndFlightNumber(Long eventId, String flightNumber);
     Optional<Flight> findTopByEvent_IdAndHelicopter_IdOrderByStartTimeDesc(Long eventId, Long helicopterId);
     long countByEvent_Id(Long eventId);
+    void deleteByEvent_Id(Long eventId);
 
 }
