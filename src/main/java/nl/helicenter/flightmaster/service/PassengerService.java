@@ -12,6 +12,8 @@ import nl.helicenter.flightmaster.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class PassengerService {
 
@@ -46,9 +48,9 @@ public class PassengerService {
         passenger.setFirstName(dto.getFirstName());
         passenger.setLastName(dto.getLastName());
         passenger.setEmail(dto.getEmail());
-        passenger.setWeightKg(dto.getWeightKg());
+        passenger.setWeight(dto.getWeightKg());
         passenger.setFlight(flight);
-        passenger.setUser(user);
+        passenger.setUserId(user);
 
         Passenger savedPassenger = passengerRepository.save(passenger);
 
@@ -57,10 +59,53 @@ public class PassengerService {
         responseDto.setFirstName(savedPassenger.getFirstName());
         responseDto.setLastName(savedPassenger.getLastName());
         responseDto.setEmail(savedPassenger.getEmail());
-        responseDto.setWeightKg(savedPassenger.getWeightKg());
+        responseDto.setWeightKg(savedPassenger.getWeight());
         responseDto.setFlightId(flight.getId());
         responseDto.setUserId(user.getId());
 
         return responseDto;
     }
+
+
+    @Transactional(readOnly = true)
+    public PassengerResponseDto getById(Long passengerId) {
+        Passenger passenger = passengerRepository.findById(passengerId)
+                .orElseThrow(() -> new EntityNotFoundException("Passenger " + passengerId + " not found"));
+        return toResponse(passenger);
+    }
+
+    @Transactional
+    public void delete(Long passengerId) {
+        if (!passengerRepository.existsById(passengerId)) {
+            throw new EntityNotFoundException("Passenger " + passengerId + " not found");
+        }
+        passengerRepository.deleteById(passengerId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<PassengerResponseDto> listByFlight(Long flightId) {
+        List<Passenger> passengers = passengerRepository.findAllByFlight_Id(flightId);
+        return passengers.stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PassengerResponseDto> listByUser(Long userId) {
+        List<Passenger> passengers = passengerRepository.findAllByUser_Id(userId);
+        return passengers.stream().map(this::toResponse).toList();
+    }
+
+    private PassengerResponseDto toResponse(Passenger passenger) {
+        PassengerResponseDto dto = new PassengerResponseDto();
+        dto.setId(passenger.getId());
+        dto.setFirstName(passenger.getFirstName());
+        dto.setLastName(passenger.getLastName());
+        dto.setEmail(passenger.getEmail());
+        dto.setWeightKg(passenger.getWeight());
+        dto.setFlightId(passenger.getFlight().getId());
+        dto.setUserId(passenger.getUserId().getId());
+        return dto;
+    }
+
+
 }

@@ -36,9 +36,6 @@ public class Flight {
     @Column(name = "fuel_after", nullable = false)
     private double fuelAfter;
 
-    @Column(name = "seats_booked", nullable = false)
-    private int seatsBooked = 0;
-
     public Flight() {}
 
     public Long getId() {
@@ -95,12 +92,5 @@ public class Flight {
 
     public void setFuelAfter(double fuelAfter) {
         this.fuelAfter = fuelAfter;
-    }
-
-    public int getSeatsBooked() {
-        return seatsBooked;
-    }
-    public void setSeatsBooked(int seatsBooked) {
-        this.seatsBooked = seatsBooked;
     }
 }

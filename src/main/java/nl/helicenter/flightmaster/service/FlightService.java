@@ -35,7 +35,6 @@ public class FlightService {
         this.helicopterRepository = helicopterRepository;
     }
     
-    
     public FlightResponseDto create(FlightRequestDto dto) {
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event " + dto.getEventId() + " niet gevonden."));
@@ -94,8 +93,6 @@ public class FlightService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
-    // helper voor dubbel gebruik 
 
     private Optional<Flight> generateFlightSlot(Event event, Helicopter heli) {
 

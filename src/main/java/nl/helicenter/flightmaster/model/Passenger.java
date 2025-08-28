@@ -33,7 +33,7 @@ public class Passenger {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private User user;
 
     public Long getId() {
         return id;
@@ -67,9 +67,6 @@ public class Passenger {
         this.email = email;
     }
 
-    @NotNull
-    @DecimalMin("10.0")
-    @DecimalMax("135.0")
     public double getWeight() {
         return weight;
     }
@@ -87,10 +84,10 @@ public class Passenger {
     }
 
     public User getUserId() {
-        return userId;
+        return user;
     }
 
-    public void setBookedBy(User userId) {
-        this.userId = userId;
+    public void setUserId(User user) {
+        this.user = user;
     }
 }
