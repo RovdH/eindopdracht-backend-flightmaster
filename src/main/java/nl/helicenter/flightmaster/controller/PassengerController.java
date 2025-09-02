@@ -37,6 +37,12 @@ public class PassengerController {
                 .body(passengerResponseDto);
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<PassengerResponseDto>> createBulk(@RequestBody @Valid List<PassengerRequestDto> passengerRequests) {
+        List<PassengerResponseDto> result = passengerService.createBulk(passengerRequests);
+        return ResponseEntity.status(201).body(result);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PassengerResponseDto> getById(@PathVariable Long id) {
         PassengerResponseDto passengerResponseDto = passengerService.getById(id);

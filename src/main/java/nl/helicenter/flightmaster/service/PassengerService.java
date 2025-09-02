@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 
 @Service
 public class PassengerService {
@@ -31,6 +36,8 @@ public class PassengerService {
 
     @Transactional
     public PassengerResponseDto create(PassengerRequestDto dto) {
+
+        if (dto == null) throw new IllegalArgumentException("Request body is empty");
         Flight flight = flightRepository.findById(dto.getFlightId())
                 .orElseThrow(() -> new EntityNotFoundException("Flight " + dto.getFlightId() + " not found"));
 
@@ -44,14 +51,7 @@ public class PassengerService {
             throw new IllegalStateException("Flight is full");
         }
 
-        Passenger passenger = new Passenger();
-        passenger.setFirstName(dto.getFirstName());
-        passenger.setLastName(dto.getLastName());
-        passenger.setEmail(dto.getEmail());
-        passenger.setWeight(dto.getWeightKg());
-        passenger.setFlight(flight);
-        passenger.setUserId(user);
-
+        Passenger passenger = mapToEntity(dto, flight, user);
         Passenger savedPassenger = passengerRepository.save(passenger);
 
         PassengerResponseDto responseDto = new PassengerResponseDto();
@@ -66,6 +66,50 @@ public class PassengerService {
         return responseDto;
     }
 
+    @Transactional
+    public List<PassengerResponseDto> createBulk(List<PassengerRequestDto> requests) {
+        if (requests == null || requests.isEmpty()) {
+            throw new IllegalArgumentException("Request list is empty");
+        }
+
+        Map<Long, List<PassengerRequestDto>> byFlight = requests.stream()
+                .collect(Collectors.groupingBy(PassengerRequestDto::getFlightId));
+
+        Map<Long, Flight> flights = flightRepository.findAllById(byFlight.keySet())
+                .stream().collect(Collectors.toMap(Flight::getId, f -> f));
+
+        for (Map.Entry<Long, List<PassengerRequestDto>> entry : byFlight.entrySet()) {
+            Long flightId = entry.getKey();
+            Flight flight = flights.get(flightId);
+            if (flight == null) {
+                throw new EntityNotFoundException("Flight " + flightId + " not found");
+            }
+            long current = passengerRepository.countByFlight_Id(flightId);
+            int capacity = flight.getHelicopter().getCapacity();
+            int incoming = entry.getValue().size();
+            if (current + incoming > capacity) {
+                throw new IllegalStateException("Flight " + flightId + " is full: capacity=" + capacity +
+                        ", alreadyBooked=" + current + ", requested=" + incoming);
+            }
+        }
+
+        Set<Long> userIds = requests.stream().map(PassengerRequestDto::getUserId).collect(Collectors.toSet());
+        Map<Long, User> users = userRepository.findAllById(userIds)
+                .stream().collect(Collectors.toMap(User::getId, u -> u));
+
+        List<Passenger> toSave = new ArrayList<>();
+        for (PassengerRequestDto dto : requests) {
+            Flight flight = flights.get(dto.getFlightId());
+            User user = users.get(dto.getUserId());
+            if (user == null) {
+                throw new EntityNotFoundException("User " + dto.getUserId() + " not found");
+            }
+            Passenger passenger = mapToEntity(dto, flight, user);
+        }
+
+        List<Passenger> saved = passengerRepository.saveAll(toSave);
+        return saved.stream().map(this::toResponse).toList();
+    }
 
     @Transactional(readOnly = true)
     public PassengerResponseDto getById(Long passengerId) {
@@ -103,8 +147,19 @@ public class PassengerService {
         dto.setEmail(passenger.getEmail());
         dto.setWeightKg(passenger.getWeight());
         dto.setFlightId(passenger.getFlight().getId());
-        dto.setUserId(passenger.getUserId().getId());
+        dto.setUserId(passenger.getUser().getId());
         return dto;
+    }
+    //Mapper om niet 2x dit lijstje op te roepen in de create 1 en create bulk
+    private Passenger mapToEntity(PassengerRequestDto dto, Flight flight, User user) {
+        Passenger passenger = new Passenger();
+        passenger.setFirstName(dto.getFirstName());
+        passenger.setLastName(dto.getLastName());
+        passenger.setEmail(dto.getEmail());
+        passenger.setWeight(dto.getWeightKg());
+        passenger.setFlight(flight);
+        passenger.setUser(user);
+        return passenger;
     }
 
 

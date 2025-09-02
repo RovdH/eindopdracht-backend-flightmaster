@@ -83,11 +83,11 @@ public class Passenger {
         this.flight = flight;
     }
 
-    public User getUserId() {
+    public User getUser() {
         return user;
     }
 
-    public void setUserId(User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 }
