@@ -9,6 +9,7 @@ import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.EventRepository;
 import nl.helicenter.flightmaster.repository.FlightRepository;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
+import nl.helicenter.flightmaster.repository.PassengerRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -26,15 +27,16 @@ public class FlightService {
     private final FlightRepository flightRepository;
     private final EventRepository eventRepository;
     private final HelicopterRepository helicopterRepository;
+    private final PassengerRepository passengerRepository;
 
     public FlightService(FlightRepository flightRepository,
                          EventRepository eventRepository,
-                         HelicopterRepository helicopterRepository) {
+                         HelicopterRepository helicopterRepository, PassengerRepository passengerRepository) {
         this.flightRepository = flightRepository;
         this.eventRepository = eventRepository;
         this.helicopterRepository = helicopterRepository;
+        this.passengerRepository = passengerRepository;
     }
-    
     
     public FlightResponseDto create(FlightRequestDto dto) {
         Event event = eventRepository.findById(dto.getEventId())
@@ -95,8 +97,6 @@ public class FlightService {
                 .collect(Collectors.toList());
     }
 
-    // helper voor dubbel gebruik 
-
     private Optional<Flight> generateFlightSlot(Event event, Helicopter heli) {
 
         Optional<Flight> prevFlightOpt =
@@ -140,15 +140,45 @@ public class FlightService {
     }
 
     private FlightResponseDto mapToResponse(Flight flight) {
+        int capacityTotal = flight.getHelicopter().getCapacity();
+        long seatsBooked = passengerRepository.countByFlight_Id(flight.getId());
+        int seatsAvailable = Math.max(0, capacityTotal - (int) seatsBooked);
+
         FlightResponseDto dto = new FlightResponseDto();
         dto.setId(flight.getId());
         dto.setFlightNumber(flight.getFlightNumber());
         dto.setStartTime(flight.getStartTime());
         dto.setEndTime(flight.getStartTime().plusMinutes((long) flight.getEvent().getFlightTime()));
         dto.setEventId(flight.getEvent().getId());
+
+        dto.setCapacityTotal(capacityTotal);
+        dto.setSeatsBooked(seatsBooked);
+        dto.setSeatsAvailable(seatsAvailable);
+
         dto.setHelicopterCallSign(flight.getHelicopter().getCallSign());
         dto.setFuelBefore(flight.getFuelBefore());
         dto.setFuelAfter(flight.getFuelAfter());
         return dto;
     }
+
+
+    public List<FlightResponseDto> listByEvent(Long eventId) {
+        List<Flight> flights = flightRepository.findByEvent_Id(eventId);
+        return flights.stream().map(flight -> {
+            int capacityTotal = flight.getHelicopter().getCapacity();
+            long booked = passengerRepository.countByFlight_Id(flight.getId());
+            int seatsAvailable = Math.max(0, capacityTotal - (int) booked );
+
+            FlightResponseDto dto = new FlightResponseDto();
+            dto.setId(flight.getId());
+            dto.setFlightNumber(flight.getFlightNumber());
+            dto.setStartTime(flight.getStartTime());
+            dto.setCapacityTotal(capacityTotal);
+            dto.setSeatsBooked(booked);
+            dto.setSeatsAvailable(seatsAvailable);
+            dto.setHelicopterCallSign(flight.getHelicopter().getCallSign());
+            return dto;
+        }).toList();
+    }
+
 }

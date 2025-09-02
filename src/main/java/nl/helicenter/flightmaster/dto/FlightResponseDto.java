@@ -12,6 +12,9 @@ public class FlightResponseDto {
     private String helicopterCallSign;
     private double fuelBefore;
     private double fuelAfter;
+    private int capacityTotal;
+    private long seatsBooked;
+    private int seatsAvailable;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -36,4 +39,16 @@ public class FlightResponseDto {
 
     public double getFuelAfter() { return fuelAfter; }
     public void setFuelAfter(double fuelAfter) { this.fuelAfter = fuelAfter; }
+
+    public int getCapacityTotal() { return capacityTotal; }
+    public void setCapacityTotal(int capacityTotal) { this.capacityTotal = capacityTotal; }
+
+    public long getSeatsBooked() { return seatsBooked; }
+    public void setSeatsBooked(long seatsBooked) {
+        this.seatsBooked = seatsBooked;
+    }
+
+    public int getSeatsAvailable() { return seatsAvailable; }
+    public void setSeatsAvailable(int seatsAvailable) { this.seatsAvailable = seatsAvailable; }
+
 }

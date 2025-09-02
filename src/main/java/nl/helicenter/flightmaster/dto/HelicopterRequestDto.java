@@ -24,7 +24,6 @@ public class HelicopterRequestDto {
     @NotNull(message = "Beschikbaarheidsstatus is verplicht")
     private Boolean available;
 
-    // Getters and setters
     public String getCallSign() {
         return callSign;
     }
