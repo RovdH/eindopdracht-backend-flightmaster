@@ -31,14 +31,14 @@ public class EventService {
         }
 
          for (Helicopter heli : helicopters) {
-            boolean conflict = eventRepository.existsByEventDateAndHelicopters_Id(dto.getDate(), heli.getId());
+            boolean conflict = eventRepository.existsByEventDateAndHelicopters_Id(dto.getEventDate(), heli.getId());
             if (conflict) {
-                throw new IllegalArgumentException("Helicopter " + heli.getCallSign() + " is al geboekt op " + dto.getDate());
+                throw new IllegalArgumentException("Helicopter " + heli.getCallSign() + " is al geboekt op " + dto.getEventDate());
             }
         }
 
         Event event = new Event();
-        event.setDate(dto.getDate());
+        event.setDate(dto.getEventDate());
         event.setLocation(dto.getLocation());
         event.setFlightTime(dto.getFlightTime());
         event.setStartTime(dto.getStartTime());
@@ -65,7 +65,7 @@ public class EventService {
     private EventResponseDto mapToResponseDto(Event event) {
         EventResponseDto dto = new EventResponseDto();
         dto.setId(event.getId());
-        dto.setDate(event.getDate());
+        dto.setEventDate(event.getDate());
         dto.setLocation(event.getLocation());
         dto.setFlightTime(event.getFlightTime());
         dto.setStartTime(event.getStartTime());

@@ -10,6 +10,7 @@ import java.util.List;
 public class EventRequestDto {
 
     @NotNull(message = "Datum van het event is verplicht")
+    @FutureOrPresent(message = "Datum mag niet in het verleden liggen")
     private LocalDate eventDate;
 
     @NotBlank(message = "Locatie is verplicht")
@@ -20,7 +21,6 @@ public class EventRequestDto {
 
     @JsonFormat(pattern = "HH:mm")
     @NotNull(message = "Starttijd is verplicht en moet in HH:mm formaat zijn")
-    @NotNull(message = "Starttijd is verplicht")
     private LocalTime startTime;
 
     @JsonFormat(pattern = "HH:mm")
@@ -36,14 +36,13 @@ public class EventRequestDto {
     }
 
     @NotEmpty(message = "Minimaal één helikopter is vereist")
-    private List<Long> helicopterIds;
+    private List<@Positive Long> helicopterIds;
 
-
-    public LocalDate getDate() {
+    public LocalDate getEventDate() {
         return eventDate;
     }
 
-    public void setDate(LocalDate eventDate) {
+    public void setEventDate(LocalDate eventDate) {
         this.eventDate = eventDate;
     }
 
