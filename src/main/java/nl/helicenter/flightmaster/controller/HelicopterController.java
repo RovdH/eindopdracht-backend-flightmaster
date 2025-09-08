@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.HelicopterRequestDto;
 import nl.helicenter.flightmaster.dto.HelicopterResponseDto;
 import nl.helicenter.flightmaster.service.HelicopterService;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class HelicopterController {
     @PostMapping
     public ResponseEntity<HelicopterResponseDto> create(@Valid @RequestBody HelicopterRequestDto dto) {
         HelicopterResponseDto created = helicopterService.addHelicopter(dto);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(created);
     }
 
     @GetMapping
