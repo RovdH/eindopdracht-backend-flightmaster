@@ -10,7 +10,6 @@ public class HelicopterResponseDto {
     private double fuelUsage;
     private boolean available;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

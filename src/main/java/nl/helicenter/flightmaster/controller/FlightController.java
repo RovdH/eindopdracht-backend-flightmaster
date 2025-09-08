@@ -1,18 +1,19 @@
 package nl.helicenter.flightmaster.controller;
 
 import jakarta.validation.Valid;
-import nl.helicenter.flightmaster.dto.EventResponseDto;
+import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.FlightRequestDto;
 import nl.helicenter.flightmaster.dto.FlightResponseDto;
 import nl.helicenter.flightmaster.service.FlightService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/flights")
+@Validated
 public class FlightController {
     private final FlightService flightService;
     public FlightController(FlightService flightService) {
@@ -25,11 +26,12 @@ public class FlightController {
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(created);
     }
 
-    @GetMapping ResponseEntity<List<FlightResponseDto>> getAll() { return ResponseEntity.ok(flightService.getAll());
+    @GetMapping
+    public ResponseEntity<List<FlightResponseDto>> getAll() { return ResponseEntity.ok(flightService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FlightResponseDto> getById(@PathVariable Long id) {
+    public ResponseEntity<FlightResponseDto> getById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(flightService.getById(id));
     }
 }

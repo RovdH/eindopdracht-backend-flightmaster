@@ -1,9 +1,11 @@
 package nl.helicenter.flightmaster.controller;
 
+import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.PassengerRequestDto;
 import nl.helicenter.flightmaster.dto.PassengerResponseDto;
 import nl.helicenter.flightmaster.service.PassengerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/passengers")
+@Validated
 public class PassengerController {
 
     private final PassengerService passengerService;
@@ -38,20 +41,20 @@ public class PassengerController {
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<List<PassengerResponseDto>> createBulk(@RequestBody @Valid List<PassengerRequestDto> passengerRequests) {
+    public ResponseEntity<List<PassengerResponseDto>> createBulk(@RequestBody @Valid List<@Valid PassengerRequestDto> passengerRequests) {
         List<PassengerResponseDto> result = passengerService.createBulk(passengerRequests);
-        return ResponseEntity.status(201).body(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PassengerResponseDto> getById(@PathVariable Long id) {
+    public ResponseEntity<PassengerResponseDto> getById(@PathVariable @Positive Long id) {
         PassengerResponseDto passengerResponseDto = passengerService.getById(id);
         return ResponseEntity.ok(passengerResponseDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable @Positive Long id) {
         passengerService.delete(id);
     }
 

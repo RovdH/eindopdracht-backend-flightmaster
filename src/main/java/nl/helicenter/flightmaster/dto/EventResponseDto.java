@@ -22,11 +22,11 @@ public class EventResponseDto {
         this.id = id;
     }
 
-    public LocalDate getDate() {
+    public LocalDate getEventDate() {
         return eventDate;
     }
 
-    public void setDate(LocalDate eventDate) {
+    public void setEventDate(LocalDate eventDate) {
         this.eventDate = eventDate;
     }
 

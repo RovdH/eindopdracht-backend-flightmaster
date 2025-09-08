@@ -1,6 +1,7 @@
 package nl.helicenter.flightmaster.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.EventRequestDto;
 import nl.helicenter.flightmaster.dto.EventResponseDto;
 import nl.helicenter.flightmaster.dto.FlightResponseDto;
@@ -8,12 +9,14 @@ import nl.helicenter.flightmaster.service.EventService;
 import nl.helicenter.flightmaster.service.FlightService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/events")
+@Validated
 public class EventController {
 
     private final EventService eventService;
@@ -32,7 +35,7 @@ public class EventController {
 
     @PostMapping("/{id}/flights/generate")
     public ResponseEntity<List<FlightResponseDto>> generate(
-            @PathVariable("id") Long eventId,
+            @PathVariable("id") @Positive Long eventId,
             @RequestParam(defaultValue = "true") boolean reset) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(flightService.generateFlightSchedule(eventId, reset));
@@ -44,12 +47,12 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventResponseDto> getById(@PathVariable Long id) {
+    public ResponseEntity<EventResponseDto> getById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(eventService.getById(id));
     }
 
     @GetMapping("/{eventId}/flights")
-    public ResponseEntity<List<FlightResponseDto>> getEventFlights(@PathVariable Long eventId) {
+    public ResponseEntity<List<FlightResponseDto>> getEventFlights(@PathVariable @Positive Long eventId) {
         return ResponseEntity.ok(flightService.getByEvent(eventId));
     }
 }

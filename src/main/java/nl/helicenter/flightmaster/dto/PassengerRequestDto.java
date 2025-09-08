@@ -56,7 +56,7 @@ public class PassengerRequestDto {
         return weightKg;
     }
 
-    public void setWeightKg(double weightKg) {
+    public void setWeightKg(Double weightKg) {
         this.weightKg = weightKg;
     }
 
