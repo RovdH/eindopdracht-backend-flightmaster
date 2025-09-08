@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-
 import java.util.HashMap;
 import java.util.Map;
 

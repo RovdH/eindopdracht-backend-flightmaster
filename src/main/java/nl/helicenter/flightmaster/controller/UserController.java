@@ -5,12 +5,13 @@ import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@Validated
 public class UserController {
 
     private final UserService userService;
