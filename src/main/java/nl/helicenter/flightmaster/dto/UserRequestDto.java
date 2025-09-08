@@ -15,8 +15,6 @@ public class UserRequestDto {
     @NotBlank(message = "Rol is verplicht")
     private String role;
 
-    // Getters en setters
-
     public String getEmail() {
         return email;
     }

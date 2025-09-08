@@ -105,6 +105,7 @@ public class PassengerService {
                 throw new EntityNotFoundException("User " + dto.getUserId() + " not found");
             }
             Passenger passenger = mapToEntity(dto, flight, user);
+            toSave.add(passenger);
         }
 
         List<Passenger> saved = passengerRepository.saveAll(toSave);
