@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 
+@Entity
 public class Pdf {
 
     @Id
