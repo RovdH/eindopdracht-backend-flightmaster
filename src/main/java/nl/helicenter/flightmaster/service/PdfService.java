@@ -54,7 +54,7 @@ public class PdfService {
             List<Passenger> pax = passengerRepository.findAllByFlight_Id(flight.getId());
             for (Passenger passenger : pax) {
                 sb.append(" - ").append(passenger.getFirstName()).append(" ").append(passenger.getLastName())
-                        .append(" | ").append(passenger.getWeight()).append(" kg\n");
+                        .append(" | ").append(passenger.getWeight()).append(" kg").append(" | ").append(passenger.getEmail()).append("\n");
             }
             sb.append("\n");
         }
