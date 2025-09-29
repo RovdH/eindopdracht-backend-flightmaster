@@ -48,24 +48,6 @@ public class PdfService {
                 .sorted(Comparator.comparing(Flight::getStartTime))
                 .toList();
 
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("Passagierslijsten" + event.getLocation() + "Event")
-//                .append(event.getDate()).append("@").append(event.getLocation()).append("\n\n");
-//
-//        for (Flight flight : flights) {
-//            sb.append("Flight ").append(flight.getFlightNumber()).append(" (").append(flight.getStartTime()).append(")\n");
-//
-//            List<Passenger> pax = passengerRepository.findAllByFlight_Id(flight.getId());
-//            for (Passenger passenger : pax) {
-//                sb.append(" - ").append(passenger.getFirstName()).append(" ").append(passenger.getLastName())
-//                        .append(" | ").append(passenger.getWeight()).append(" kg").append(" | ").append(passenger.getEmail()).append("\n");
-//            }
-//            sb.append("\n");
-//        }
-//
-//        byte[] pdfBytes = simplePdf(sb.toString());
-//        String fileName = "Passagierslijst" + event.getLocation() + event.getDate() + ".pdf";
-
         byte[] pdfBytes = createPdfBytes(event, flights);
         String fileName = "Passagierslijst_" + event.getLocation() + "_" + event.getDate() + ".pdf";
 
@@ -186,7 +168,4 @@ public class PdfService {
         dto.setCreatedAt(d.getCreatedAt());
         return dto;
     }
-//    private byte[] simplePdf(String content) {
-//        return ("OUTPUT_PDF\n\n" + content).getBytes(StandardCharsets.UTF_8);
-//    }
 }

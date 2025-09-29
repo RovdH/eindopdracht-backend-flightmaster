@@ -47,14 +47,4 @@ public class PdfController {
                 .contentLength(bytes.length)
                 .body(bytes);
     }
-
-//    @GetMapping("/pdfs/{id}/preview")
-//    public ResponseEntity<byte[]> preview(@PathVariable @Positive Long id) {
-//        byte[] bytes = pdfService.getBytes(id);
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"manifest.txt\"")
-//                .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-//                .body(bytes);
-//    }
-
 }
