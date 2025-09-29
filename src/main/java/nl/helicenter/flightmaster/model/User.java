@@ -52,4 +52,14 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_photo_file_name")
+    private UserPhoto userPhoto;
+
+    public UserPhoto getUserPhoto() {
+        return userPhoto;
+    }
+    public void setUserPhoto(UserPhoto userPhoto) {
+        this.userPhoto = userPhoto;
+    }
 }
