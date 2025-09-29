@@ -13,11 +13,13 @@ import nl.helicenter.flightmaster.repository.PdfRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
+import java.util.Comparator;
 import java.util.List;
-
-import static java.util.Arrays.stream;
-import static org.apache.coyote.http11.Constants.a;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 
 @Service
 public class PdfService {
@@ -42,25 +44,31 @@ public class PdfService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("Event" + eventId + "niet gevonden"));
 
         List<Flight> flights = flightRepository.findByEvent_Id(eventId)
-                .stream().sorted((a, b) -> a.getStartTime().compareTo(b.getStartTime())).toList();
+                .stream()
+                .sorted(Comparator.comparing(Flight::getStartTime))
+                .toList();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Passagierslijsten" + event.getLocation() + "Event")
-                .append(event.getDate()).append("@").append(event.getLocation()).append("\n\n");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("Passagierslijsten" + event.getLocation() + "Event")
+//                .append(event.getDate()).append("@").append(event.getLocation()).append("\n\n");
+//
+//        for (Flight flight : flights) {
+//            sb.append("Flight ").append(flight.getFlightNumber()).append(" (").append(flight.getStartTime()).append(")\n");
+//
+//            List<Passenger> pax = passengerRepository.findAllByFlight_Id(flight.getId());
+//            for (Passenger passenger : pax) {
+//                sb.append(" - ").append(passenger.getFirstName()).append(" ").append(passenger.getLastName())
+//                        .append(" | ").append(passenger.getWeight()).append(" kg").append(" | ").append(passenger.getEmail()).append("\n");
+//            }
+//            sb.append("\n");
+//        }
+//
+//        byte[] pdfBytes = simplePdf(sb.toString());
+//        String fileName = "Passagierslijst" + event.getLocation() + event.getDate() + ".pdf";
 
-        for (Flight flight : flights) {
-            sb.append("Flight ").append(flight.getFlightNumber()).append(" (").append(flight.getStartTime()).append(")\n");
+        byte[] pdfBytes = createPdfBytes(event, flights);
+        String fileName = "Passagierslijst_" + event.getLocation() + "_" + event.getDate() + ".pdf";
 
-            List<Passenger> pax = passengerRepository.findAllByFlight_Id(flight.getId());
-            for (Passenger passenger : pax) {
-                sb.append(" - ").append(passenger.getFirstName()).append(" ").append(passenger.getLastName())
-                        .append(" | ").append(passenger.getWeight()).append(" kg").append(" | ").append(passenger.getEmail()).append("\n");
-            }
-            sb.append("\n");
-        }
-
-        byte[] pdfBytes = simplePdf(sb.toString());
-        String fileName = "Passagierslijst" + event.getLocation() + event.getDate() + ".pdf";
 
         Pdf pdf = new Pdf();
         pdf.setEvent(event);
@@ -70,6 +78,84 @@ public class PdfService {
         pdf.setSizeBytes(pdfBytes.length);
         Pdf saved = pdfRepository.save(pdf);
         return toDto(saved);
+    }
+
+    private byte[] createPdfBytes(Event event, List<Flight> flights) {
+        try (ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            Document doc = new Document(PageSize.A4, 36, 36, 36, 36);
+            PdfWriter.getInstance(doc, baos);
+            doc.open();
+
+            var title = new Paragraph(
+                    "Passagierslijst – " + event.getDate() + " @ " + event.getLocation(),
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16)
+            );
+            title.setSpacingAfter(12f);
+            doc.add(title);
+
+            var meta = new Paragraph(
+                    "Eventdatum: " + event.getDate() + "\nLocatie: " + event.getLocation(),
+                    FontFactory.getFont(FontFactory.HELVETICA, 11)
+            );
+            meta.setSpacingAfter(12f);
+            doc.add(meta);
+
+            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
+            Font cellFont   = FontFactory.getFont(FontFactory.HELVETICA, 10);
+
+            for (Flight flight : flights) {
+                Paragraph flightHeader = new Paragraph(
+                        "Vlucht " + flight.getFlightNumber()
+                                + "  (" + flight.getStartTime() + "–"
+                                + flight.getStartTime().plusMinutes((long) flight.getEvent().getFlightTime()) + ")  "
+                                + "Heli: " + flight.getHelicopter().getCallSign(),
+                        FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13)
+                );
+                flightHeader.setSpacingBefore(10f);
+                flightHeader.setSpacingAfter(6f);
+                doc.add(flightHeader);
+
+                PdfPTable table = new PdfPTable(new float[]{3f, 5f, 2f});
+                table.setWidthPercentage(100);
+
+                table.addCell(headerCell("Naam", headerFont));
+                table.addCell(headerCell("E-mail", headerFont));
+                table.addCell(headerCell("Gewicht (kg)", headerFont));
+
+                List<Passenger> pax = passengerRepository.findAllByFlight_Id(flight.getId());
+                if (pax.isEmpty()) {
+                    PdfPCell empty = new PdfPCell(new Phrase("— geen passagiers —", cellFont));
+                    empty.setColspan(3);
+                    table.addCell(empty);
+                } else {
+                    for (Passenger p : pax) {
+                        table.addCell(bodyCell(p.getFirstName() + " " + p.getLastName(), cellFont));
+                        table.addCell(bodyCell(p.getEmail(), cellFont));
+                        table.addCell(bodyCell(String.valueOf(p.getWeight()), cellFont));
+                    }
+                }
+
+                doc.add(table);
+            }
+
+            doc.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new IllegalStateException("Kon PDF niet genereren", e);
+        }
+    }
+
+    private PdfPCell headerCell(String text, Font font) {
+        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        c.setHorizontalAlignment(Element.ALIGN_LEFT);
+        c.setPadding(6f);
+        return c;
+    }
+
+    private PdfPCell bodyCell(String text, Font font) {
+        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        c.setPadding(5f);
+        return c;
     }
 
     @Transactional(readOnly = true)
@@ -100,7 +186,7 @@ public class PdfService {
         dto.setCreatedAt(d.getCreatedAt());
         return dto;
     }
-    private byte[] simplePdf(String content) {
-        return ("OUTPUT_PDF\n\n" + content).getBytes(StandardCharsets.UTF_8);
-    }
+//    private byte[] simplePdf(String content) {
+//        return ("OUTPUT_PDF\n\n" + content).getBytes(StandardCharsets.UTF_8);
+//    }
 }

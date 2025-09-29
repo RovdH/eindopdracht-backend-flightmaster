@@ -39,20 +39,22 @@ public class PdfController {
 
     @GetMapping("/pdfs/{id}/download")
     public ResponseEntity<byte[]> download(@PathVariable @Positive Long id) {
+        PdfResponseDto meta = pdfService.getMeta(id);
         byte[] bytes = pdfService.getBytes(id);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"document.pdf\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + meta.getFileName() + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(bytes.length)
                 .body(bytes);
     }
 
-    @GetMapping("/pdfs/{id}/preview")
-    public ResponseEntity<byte[]> preview(@PathVariable @Positive Long id) {
-        byte[] bytes = pdfService.getBytes(id);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"manifest.txt\"")
-                .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                .body(bytes);
-    }
+//    @GetMapping("/pdfs/{id}/preview")
+//    public ResponseEntity<byte[]> preview(@PathVariable @Positive Long id) {
+//        byte[] bytes = pdfService.getBytes(id);
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"manifest.txt\"")
+//                .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+//                .body(bytes);
+//    }
 
 }
