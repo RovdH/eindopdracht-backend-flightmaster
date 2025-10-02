@@ -18,14 +18,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileUploadRepository fileUploadRepository;
     private final UserPhotoService userPhotoService;
-//    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService) {
-//        PasswordEncoder passwordEncoder achter userRepo terugzetten hierboven als we de encoder aanzetten na testen
         this.userRepository = userRepository;
         this.userPhotoService = userPhotoService;
         this.fileUploadRepository = fileUploadRepository;
-//        this.passwordEncoder = passwordEncoder;
     }
 
     public String registerUser(UserRequestDto dto) {
@@ -36,8 +33,11 @@ public class UserService {
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
-        user.setRole(dto.getRole());
-
+        if (dto.getRole() == null || !"ADMIN".equalsIgnoreCase(dto.getRole())) {
+            user.setRole("USER");
+        } else {
+            user.setRole("USER");
+        }
         userRepository.save(user);
         return user.getEmail();
     }
