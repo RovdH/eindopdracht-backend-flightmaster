@@ -3,7 +3,7 @@ package nl.helicenter.flightmaster.service;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.repository.UserRepository;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.Resource;
@@ -17,12 +17,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileUploadRepository fileUploadRepository;
+    private final PasswordEncoder passwordEncoder;
     private final UserPhotoService userPhotoService;
 
-    public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService) {
+    public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userPhotoService = userPhotoService;
         this.fileUploadRepository = fileUploadRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String registerUser(UserRequestDto dto) {
@@ -32,12 +34,9 @@ public class UserService {
 
         User user = new User();
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        if (dto.getRole() == null || !"ADMIN".equalsIgnoreCase(dto.getRole())) {
-            user.setRole("USER");
-        } else {
-            user.setRole("USER");
-        }
+        var hashed = passwordEncoder.encode(dto.getPassword());
+        user.setPassword(hashed);
+        user.setRole("USER");
         userRepository.save(user);
         return user.getEmail();
     }

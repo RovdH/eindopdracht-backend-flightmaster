@@ -3,8 +3,6 @@ package nl.helicenter.flightmaster.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -26,40 +27,23 @@ import java.util.List;
 public class SecurityConfig {
 
     private final DataSource dataSource;
-    private final JwtRequestFilter jwtRequestFilter;
     private final RestAuthenticationEntryPoint authEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
 
     public SecurityConfig(
             DataSource dataSource,
-            JwtRequestFilter jwtRequestFilter,
             RestAuthenticationEntryPoint authEntryPoint,
             RestAccessDeniedHandler accessDeniedHandler
     ) {
         this.dataSource = dataSource;
-        this.jwtRequestFilter = jwtRequestFilter;
         this.authEntryPoint = authEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
     }
 
+
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder
-                .jdbcAuthentication()
-                .dataSource(dataSource)
-                .passwordEncoder(passwordEncoder())
-                .usersByUsernameQuery("""
-                SELECT email AS username, password, TRUE AS enabled
-                FROM users
-                WHERE email = ?
-            """)
-                .authoritiesByUsernameQuery("""
-                SELECT email AS username, CONCAT('ROLE_', UPPER(role)) AS authority
-                FROM users
-                WHERE email = ?
-            """);
-        return builder.build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
@@ -84,7 +68,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -96,7 +80,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Publiek
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/refresh", "/actuator/health").permitAll()
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/refresh", "/actuator/health", "/error").permitAll()
                         // Auth required
                         .requestMatchers(HttpMethod.GET, "/users", "/users/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/users/*/photo").authenticated()
@@ -105,7 +89,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,   "/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-                        .anyRequest().denyAll()
+                        .anyRequest().authenticated()
                 );
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

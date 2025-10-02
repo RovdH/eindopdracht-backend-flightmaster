@@ -1,10 +1,13 @@
 package nl.helicenter.flightmaster.controller;
 
 import jakarta.validation.Valid;
+import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.security.JwtUtil;
+import nl.helicenter.flightmaster.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,11 +17,20 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwt;
+    private final UserService userService;
 
-    public AuthController(AuthenticationManager am, UserDetailsService uds, JwtUtil jwt) {
+    public AuthController(AuthenticationManager am, UserDetailsService uds, JwtUtil jwt, UserService us) {
         this.authenticationManager = am;
         this.userDetailsService = uds;
         this.jwt = jwt;
+        this.userService = us;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@Valid @RequestBody UserRequestDto dto) {
+        dto.setRole("USER");
+        userService.registerUser(dto);
+        return ResponseEntity.status(201).build();
     }
 
     @PostMapping("/login")
