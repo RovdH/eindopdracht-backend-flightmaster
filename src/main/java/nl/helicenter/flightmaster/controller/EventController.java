@@ -55,4 +55,10 @@ public class EventController {
     public ResponseEntity<List<FlightResponseDto>> getEventFlights(@PathVariable @Positive Long eventId) {
         return ResponseEntity.ok(flightService.getByEvent(eventId));
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable @Positive Long id) {
+        eventService.delete(id);
+    }
 }

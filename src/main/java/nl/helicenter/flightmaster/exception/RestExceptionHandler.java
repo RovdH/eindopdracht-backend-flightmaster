@@ -49,7 +49,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleJsonParseError(HttpMessageNotReadableException ex) {
-        String message = "Ongeldig formaat in JSON. Controleer dat tijden in HH:mm formaat zijn.";
+        String message = "Ongeldig formaat in JSON. Controleer of alle waardes aanwezig en correct zijn.";
         return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 

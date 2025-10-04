@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.HelicopterRequestDto;
 import nl.helicenter.flightmaster.dto.HelicopterResponseDto;
 import nl.helicenter.flightmaster.service.HelicopterService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -36,5 +37,11 @@ public class HelicopterController {
     @GetMapping("/{id}")
     public ResponseEntity<HelicopterResponseDto> getById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(helicopterService.getHelicopterById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable @Positive Long id) {
+        helicopterService.delete(id);
     }
 }

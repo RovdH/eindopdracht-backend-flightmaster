@@ -6,6 +6,7 @@ import nl.helicenter.flightmaster.dto.HelicopterResponseDto;
 import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,5 +56,13 @@ public class HelicopterService {
         dto.setFuelUsage(helicopter.getFuelUsage());
         dto.setAvailable(helicopter.isAvailable());
         return dto;
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        if (!helicopterRepository.existsById(id)) {
+            throw new EntityNotFoundException("Helicopter with id" + id + " not found");
+        }
+        helicopterRepository.deleteById(id);
     }
 }

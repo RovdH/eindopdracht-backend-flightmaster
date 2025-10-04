@@ -1,13 +1,19 @@
 package nl.helicenter.flightmaster.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.EventRequestDto;
 import nl.helicenter.flightmaster.dto.EventResponseDto;
 import nl.helicenter.flightmaster.model.Event;
 import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.EventRepository;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,5 +82,12 @@ public class EventService {
                         .collect(Collectors.toList())
         );
         return dto;
+    }
+    @Transactional
+    public void delete(Long id) {
+        if (!eventRepository.existsById(id)) {
+            throw new EntityNotFoundException("Event with id" + id + " not found");
+        }
+        eventRepository.deleteById(id);
     }
 }

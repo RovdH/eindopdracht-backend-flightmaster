@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.Resource;
 import nl.helicenter.flightmaster.model.UserPhoto;
 import nl.helicenter.flightmaster.repository.FileUploadRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class UserService {
         user.setEmail(dto.getEmail());
         var hashed = passwordEncoder.encode(dto.getPassword());
         user.setPassword(hashed);
-        user.setRole("USER");
+        user.setRole(dto.getRole());
         userRepository.save(user);
         return user.getEmail();
     }
@@ -76,6 +77,14 @@ public class UserService {
         user.setUserPhoto(null);
         userRepository.save(user);
         userPhotoService.deleteFile(fileName);
+    }
+
+    @Transactional
+    public void delete(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User " + userId + " not found");
+        }
+        userRepository.deleteById(userId);
     }
 
 }
