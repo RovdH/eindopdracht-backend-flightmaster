@@ -3,12 +3,13 @@ package nl.helicenter.flightmaster.service;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.repository.UserRepository;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.Resource;
 import nl.helicenter.flightmaster.model.UserPhoto;
 import nl.helicenter.flightmaster.repository.FileUploadRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,15 +18,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileUploadRepository fileUploadRepository;
+    private final PasswordEncoder passwordEncoder;
     private final UserPhotoService userPhotoService;
-//    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService) {
-//        PasswordEncoder passwordEncoder achter userRepo terugzetten hierboven als we de encoder aanzetten na testen
+    public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userPhotoService = userPhotoService;
         this.fileUploadRepository = fileUploadRepository;
-//        this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String registerUser(UserRequestDto dto) {
@@ -35,9 +35,9 @@ public class UserService {
 
         User user = new User();
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        var hashed = passwordEncoder.encode(dto.getPassword());
+        user.setPassword(hashed);
         user.setRole(dto.getRole());
-
         userRepository.save(user);
         return user.getEmail();
     }
@@ -77,6 +77,14 @@ public class UserService {
         user.setUserPhoto(null);
         userRepository.save(user);
         userPhotoService.deleteFile(fileName);
+    }
+
+    @Transactional
+    public void delete(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User " + userId + " not found");
+        }
+        userRepository.deleteById(userId);
     }
 
 }

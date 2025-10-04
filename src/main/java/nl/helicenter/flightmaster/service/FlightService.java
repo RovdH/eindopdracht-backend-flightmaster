@@ -11,6 +11,7 @@ import nl.helicenter.flightmaster.repository.FlightRepository;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
 import nl.helicenter.flightmaster.repository.PassengerRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -139,6 +140,14 @@ public class FlightService {
         return Optional.of(flightRepository.save(flight));
     }
 
+    @Transactional
+    public void delete(Long id) {
+        if (!flightRepository.existsById(id)) {
+            throw new EntityNotFoundException("Flight with id" + id + " not found");
+        }
+        flightRepository.deleteById(id);
+    }
+
     private FlightResponseDto mapToResponse(Flight flight) {
         int capacityTotal = flight.getHelicopter().getCapacity();
         long seatsBooked = passengerRepository.countByFlight_Id(flight.getId());
@@ -180,5 +189,4 @@ public class FlightService {
             return dto;
         }).toList();
     }
-
 }

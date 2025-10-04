@@ -1,10 +1,12 @@
 package nl.helicenter.flightmaster.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.service.UserPhotoService;
 import nl.helicenter.flightmaster.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +54,8 @@ public class UserController {
                 .path("/photo")
                 .toUriString();
 
-        String fileName = userPhotoService.storeFile(file);       // opslaan op disk
-        User updated = userService.assignPhotoToUser(fileName, userId); // koppelen aan user
+        String fileName = userPhotoService.storeFile(file);
+        User updated = userService.assignPhotoToUser(fileName, userId);
 
         return ResponseEntity.created(URI.create(url)).body(updated);
     }
@@ -61,7 +63,7 @@ public class UserController {
     @PutMapping("/{id}/photo")
     public ResponseEntity<User> overwriteUserPhoto(@PathVariable("id") Long userId,
                                                    @RequestBody MultipartFile file) throws IOException {
-        String fileName = userPhotoService.storeFile(file);       // REPLACE_EXISTING
+        String fileName = userPhotoService.storeFile(file);
         User updated = userService.assignPhotoToUser(fileName, userId);
         return ResponseEntity.ok(updated);
     }
@@ -88,6 +90,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUserPhoto(@PathVariable("id") Long userId) {
         userService.deletePhotoFromUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable @Positive Long id) {
+        userService.delete(id);
     }
 
 }
