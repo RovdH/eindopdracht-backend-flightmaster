@@ -36,8 +36,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserRequestDto dto) {
-        String email = userService.registerUser(dto);
-        return ResponseEntity.ok("Gebruiker geregistreerd: " + email);
+        Long id = userService.registerUser(dto);
+        return ResponseEntity.ok("Gebruiker geregistreerd met id: " + id);
     }
 
     @GetMapping
@@ -46,32 +46,31 @@ public class UserController {
     }
 
     @PostMapping("/{id}/photo")
-    public ResponseEntity<User> addPhotoToUser(@PathVariable("id") Long userId,
-                                               @RequestBody MultipartFile file) throws IOException {
+    public ResponseEntity<User> addPhotoToUser(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         String url = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/users/")
-                .path(Objects.requireNonNull(userId.toString()))
+                .path(Objects.requireNonNull(id.toString()))
                 .path("/photo")
                 .toUriString();
 
         String fileName = userPhotoService.storeFile(file);
-        User updated = userService.assignPhotoToUser(fileName, userId);
+        User updated = userService.assignPhotoToUser(fileName, id);
 
         return ResponseEntity.created(URI.create(url)).body(updated);
     }
 
     @PutMapping("/{id}/photo")
-    public ResponseEntity<User> overwriteUserPhoto(@PathVariable("id") Long userId,
+    public ResponseEntity<User> overwriteUserPhoto(@PathVariable("id") Long id,
                                                    @RequestBody MultipartFile file) throws IOException {
         String fileName = userPhotoService.storeFile(file);
-        User updated = userService.assignPhotoToUser(fileName, userId);
+        User updated = userService.assignPhotoToUser(fileName, id);
         return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/{id}/photo")
-    public ResponseEntity<Resource> getUserPhoto(@PathVariable("id") Long userId,
+    public ResponseEntity<Resource> getUserPhoto(@PathVariable("id") Long id,
                                                  HttpServletRequest request) {
-        Resource resource = userService.getPhotoFromUser(userId);
+        Resource resource = userService.getPhotoFromUser(id);
 
         String mimeType;
         try {
@@ -87,8 +86,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/photo")
-    public ResponseEntity<Void> deleteUserPhoto(@PathVariable("id") Long userId) {
-        userService.deletePhotoFromUser(userId);
+    public ResponseEntity<Void> deleteUserPhoto(@PathVariable("id") Long id) {
+        userService.deletePhotoFromUser(id);
         return ResponseEntity.noContent().build();
     }
 
