@@ -23,9 +23,10 @@ class UserServiceTest {
 
     @Test
     void createUser_mapsEncryptsAndSaves() {
-        var dto = new UserRequestDto();
+        UserRequestDto dto = new UserRequestDto();
         dto.setEmail("henk@voorbeeld.nl");
         dto.setPassword("Geheimpje123!");
+        dto.setRole("USER");
 
         when(passwordEncoder.encode("Geheimpje123!")).thenReturn("BECRYPTED");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> {
@@ -34,9 +35,9 @@ class UserServiceTest {
             return user;
         });
 
-        String result = userService.registerUser(dto);
+        Long result = userService.registerUser(dto);
 
-        assertThat(result).isEqualTo("henk@voorbeeld.nl");
+        assertThat(result).isEqualTo(1L);
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(captor.capture());
@@ -50,7 +51,7 @@ class UserServiceTest {
 
     @Test
     void registerUser_emailAlreadyExists_throws() {
-        var dto = new UserRequestDto();
+        UserRequestDto dto = new UserRequestDto();
         dto.setEmail("henk@voorbeeld.nl");
         dto.setPassword("Geheimpje123!");
         dto.setRole("USER");

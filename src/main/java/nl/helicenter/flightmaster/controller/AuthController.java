@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -27,10 +30,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody UserRequestDto dto) {
+    public ResponseEntity<Map<String, Long>> register(@Valid @RequestBody UserRequestDto dto) {
         dto.setRole("USER");
-        userService.registerUser(dto);
-        return ResponseEntity.status(201).build();
+        Long id = userService.registerUser(dto);
+        return ResponseEntity.created(URI.create("/users/" + id)).body(Map.of("id", id));
     }
 
     @PostMapping("/login")
