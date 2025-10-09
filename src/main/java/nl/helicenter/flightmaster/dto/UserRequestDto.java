@@ -17,8 +17,6 @@ public class UserRequestDto {
     @Size(min = 8, max = 64, message = "Wachtwoord moet 8-64 tekens zijn")
     private String password;
 
-    @NotBlank(message = "Rol is verplicht")
-    @Pattern(regexp = "USER|ADMIN|PILOT", message = "Rol moet USER, PILOT of ADMIN zijn")
     private String role;
 
     public String getEmail() {

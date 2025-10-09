@@ -39,7 +39,7 @@ class UserControllerUnitTest {
     @MockitoBean UserPhotoService userPhotoService;
 
     @Test
-    void createUser_asAdmin_returns200_withTextMessage_andPassesRoleFromPayload() throws Exception {
+    void createUser_asAdmin_returns201_andSetsRoleFromPost() throws Exception {
 
         given(userService.registerUser(any(UserRequestDto.class))).willReturn(123L);
 
