@@ -37,7 +37,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserRequestDto dto) {
         Long id = userService.registerUser(dto);
-        return ResponseEntity.ok("Gebruiker geregistreerd met id: " + id);
+        return ResponseEntity.created(URI.create("/users/" + id))
+                .contentType(MediaType.TEXT_PLAIN)
+                .body("Gebruiker geregistreerd met id: " + id);
     }
 
     @GetMapping

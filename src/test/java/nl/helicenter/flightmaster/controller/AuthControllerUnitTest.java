@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuthController.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-class AuthControllerWebMvcTest {
+class AuthControllerUnitTest {
 
     @Autowired MockMvc mvc;
 
@@ -42,7 +44,8 @@ class AuthControllerWebMvcTest {
     void register_forcesRoleUSER_andReturns201EmptyBody() throws Exception {
         willReturn(1L).given(userService).registerUser(any(UserRequestDto.class));
 
-        mvc.perform(post("/auth/register")
+        MvcResult result = this.mvc
+                .perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
           {"email":"rody@banaan.com","password":"Geheimpje123!","role":"ADMIN"}
@@ -50,7 +53,9 @@ class AuthControllerWebMvcTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/users/1"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
 
         var captor = ArgumentCaptor.forClass(UserRequestDto.class);
         verify(userService).registerUser(captor.capture());
@@ -67,7 +72,8 @@ class AuthControllerWebMvcTest {
                         .content("""
                   {"email":"rodybanaan","password":"!","role":""}
                 """))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andDo(MockMvcResultHandlers.print());
     }
 
 }

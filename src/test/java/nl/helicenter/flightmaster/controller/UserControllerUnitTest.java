@@ -14,8 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -25,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserController.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-class UserControllerWebMvcTest {
+class UserControllerUnitTest {
 
     @Autowired MockMvc mvc;
 
@@ -40,29 +43,38 @@ class UserControllerWebMvcTest {
 
         given(userService.registerUser(any(UserRequestDto.class))).willReturn(123L);
 
-        mvc.perform(post("/users")
+        MvcResult result = this.mvc
+                .perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {"email":"pilot@flightmaster.nl","password":"Bananenpannekoek1!","role":"PILOT"}
                 """))
-                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-                .andExpect(content().string("Gebruiker geregistreerd met id: 123"));
+                .andExpect(content().string("Gebruiker geregistreerd met id: 123"))
+                .andExpect(header().string("Location", matchesPattern("/users/\\d+")))
+                .andReturn();
+
 
         var captor = ArgumentCaptor.forClass(UserRequestDto.class);
         verify(userService).registerUser(captor.capture());
         var dto = captor.getValue();
         assertThat(dto.getEmail()).isEqualTo("pilot@flightmaster.nl");
         assertThat(dto.getRole()).isEqualTo("PILOT");
+
     }
 
     @Test
     void createUser_invalidPayload_returns400() throws Exception {
-        mvc.perform(post("/users")
+        MvcResult result = this.mvc
+        .perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {"email":"", "password":"", "role":""}
                 """))
-                .andExpect(status().isBadRequest());
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
     }
 }
