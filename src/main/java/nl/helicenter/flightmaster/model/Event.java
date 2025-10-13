@@ -28,7 +28,8 @@ public class Event {
     )
     private List<Helicopter> helicopters = new ArrayList<>();
 
-    public Event() {}
+    public Event() {
+    }
 
     public Long getId() {
         return id;

@@ -9,7 +9,8 @@ public class UserPhoto {
     @Id
     private String fileName;
 
-    public UserPhoto() {}
+    public UserPhoto() {
+    }
 
     public UserPhoto(String fileName) {
         this.fileName = fileName;

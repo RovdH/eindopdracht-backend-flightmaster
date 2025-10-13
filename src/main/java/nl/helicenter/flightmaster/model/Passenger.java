@@ -19,11 +19,15 @@ public class Passenger {
     @Size(max = 60)
     private String lastName;
 
-    @NotBlank @Email @Size(max = 120)
+    @NotBlank
+    @Email
+    @Size(max = 120)
     @Column(nullable = false)
     private String email;
 
-    @NotNull @DecimalMin("10.0") @DecimalMax("135.0")
+    @NotNull
+    @DecimalMin("10.0")
+    @DecimalMax("135.0")
     @Column(nullable = false)
     private double weight;
 

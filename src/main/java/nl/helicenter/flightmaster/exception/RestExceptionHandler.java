@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class RestExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler({ ConstraintViolationException.class, BindException.class })
+    @ExceptionHandler({ConstraintViolationException.class, BindException.class})
     public ResponseEntity<Object> handleConstraintViolations(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", "Ongeldige parameter(s) of pad variabele.", "details", ex.getMessage()));

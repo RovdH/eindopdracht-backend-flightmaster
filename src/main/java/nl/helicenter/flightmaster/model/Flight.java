@@ -1,6 +1,7 @@
 package nl.helicenter.flightmaster.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalTime;
 
 @Entity
@@ -36,7 +37,8 @@ public class Flight {
     @Column(name = "fuel_after", nullable = false)
     private double fuelAfter;
 
-    public Flight() {}
+    public Flight() {
+    }
 
     public Long getId() {
         return id;
