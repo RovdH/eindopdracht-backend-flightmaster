@@ -151,6 +151,7 @@ public class PassengerService {
         dto.setUserId(passenger.getUser().getId());
         return dto;
     }
+
     //Mapper om niet 2x dit lijstje op te roepen in de create 1 en create bulk
     private Passenger mapToEntity(PassengerRequestDto dto, Flight flight, User user) {
         Passenger passenger = new Passenger();

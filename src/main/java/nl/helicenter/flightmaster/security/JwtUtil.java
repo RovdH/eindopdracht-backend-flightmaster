@@ -51,7 +51,7 @@ public class JwtUtil {
         long exp = System.currentTimeMillis() + refreshDays * 24L * 60L * 60L * 1000L;
         return Jwts.builder()
                 .setSubject(user.getUsername())
-                .claim("type","refresh")
+                .claim("type", "refresh")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(exp))
                 .signWith(key, SignatureAlgorithm.HS256)

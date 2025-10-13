@@ -38,7 +38,7 @@ public class FlightService {
         this.helicopterRepository = helicopterRepository;
         this.passengerRepository = passengerRepository;
     }
-    
+
     public FlightResponseDto create(FlightRequestDto dto) {
         Event event = eventRepository.findById(dto.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event " + dto.getEventId() + " niet gevonden."));
@@ -120,15 +120,15 @@ public class FlightService {
             start = start.plusMinutes(REFUEL_MINUTES);
             fuelBefore = heli.getFuelCapacity();
         }
-        
+
         LocalTime calcEndTime = start.plusMinutes((long) minutes);
         if (start.isBefore(event.getStartTime()) || calcEndTime.isAfter(event.getEndTime())) {
             return Optional.empty();
         }
-        
+
         long idx = flightRepository.countByEvent_Id(event.getId()) + 1;
         String flightNumber = "FL" + idx;
-        
+
         Flight flight = new Flight();
         flight.setEvent(event);
         flight.setHelicopter(heli);
@@ -176,7 +176,7 @@ public class FlightService {
         return flights.stream().map(flight -> {
             int capacityTotal = flight.getHelicopter().getCapacity();
             long booked = passengerRepository.countByFlight_Id(flight.getId());
-            int seatsAvailable = Math.max(0, capacityTotal - (int) booked );
+            int seatsAvailable = Math.max(0, capacityTotal - (int) booked);
 
             FlightResponseDto dto = new FlightResponseDto();
             dto.setId(flight.getId());

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.util.Comparator;
 import java.util.List;
+
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -83,7 +84,7 @@ public class PdfService {
             doc.add(meta);
 
             Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
-            Font cellFont   = FontFactory.getFont(FontFactory.HELVETICA, 10);
+            Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
 
             for (Flight flight : flights) {
                 Paragraph flightHeader = new Paragraph(

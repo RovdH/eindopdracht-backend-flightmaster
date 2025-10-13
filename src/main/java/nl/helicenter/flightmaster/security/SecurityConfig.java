@@ -50,15 +50,15 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         JdbcUserDetailsManager mgr = new JdbcUserDetailsManager(dataSource);
         mgr.setUsersByUsernameQuery("""
-            SELECT email AS username, password, TRUE AS enabled
-            FROM users
-            WHERE email = ?
-        """);
+                    SELECT email AS username, password, TRUE AS enabled
+                    FROM users
+                    WHERE email = ?
+                """);
         mgr.setAuthoritiesByUsernameQuery("""
-            SELECT email AS username, CONCAT('ROLE_', UPPER(role)) AS authority
-            FROM users
-            WHERE email = ?
-        """);
+                    SELECT email AS username, CONCAT('ROLE_', UPPER(role)) AS authority
+                    FROM users
+                    WHERE email = ?
+                """);
         return mgr;
     }
 
@@ -84,12 +84,12 @@ public class SecurityConfig {
                         // Alleen ingelogd
                         .requestMatchers(HttpMethod.GET, "/users/{id}", "/events", "/events/{id}", "/passengers/by-user/{userID}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/users/*/photo", "/passengers").authenticated()
-                        .requestMatchers(HttpMethod.PUT,  "/users/*/photo").authenticated()
-                        .requestMatchers(HttpMethod.PATCH,  "/users/*/photo").authenticated()
-                        .requestMatchers(HttpMethod.DELETE,  "/passengers/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/users/*/photo").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/users/*/photo").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/passengers/{id}").authenticated()
                         // Admin-rechten only
-                        .requestMatchers(HttpMethod.POST,   "/users/**", "/events/**", "/flights/**", "/helicopters/**", "/passengers/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,    "/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users/**", "/events/**", "/flights/**", "/helicopters/**", "/passengers/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/**", "/passengers/**", "/flights/**", "/events/**", "/helicopters/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
@@ -102,7 +102,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         var cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(List.of("http://localhost:3000"));
-        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
         cfg.setAllowCredentials(true);
         var source = new UrlBasedCorsConfigurationSource();
