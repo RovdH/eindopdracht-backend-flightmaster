@@ -19,7 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class RegisterLoginIntegrationTest {
 
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
 
     @Test
     void registerThenLogin_returnsTokens() throws Exception {
@@ -30,8 +31,8 @@ class RegisterLoginIntegrationTest {
                 .perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                  {"email":"%s","password":"%s"}
-                """.formatted(email, password)))
+                                  {"email":"%s","password":"%s"}
+                                """.formatted(email, password)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andDo(MockMvcResultHandlers.print())
@@ -41,8 +42,8 @@ class RegisterLoginIntegrationTest {
                 .perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                  {"email":"%s","password":"%s"}
-                """.formatted(email, password)))
+                                  {"email":"%s","password":"%s"}
+                                """.formatted(email, password)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))

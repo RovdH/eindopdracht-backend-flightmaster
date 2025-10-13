@@ -7,6 +7,6 @@ import java.util.List;
 
 
 public interface PdfRepository extends JpaRepository<Pdf, Long> {
-        List<Pdf> findByEventId(Long eventId);
-    }
+    List<Pdf> findByEventId(Long eventId);
+}
 

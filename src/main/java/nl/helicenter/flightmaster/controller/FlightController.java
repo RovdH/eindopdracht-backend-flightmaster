@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -17,6 +18,7 @@ import java.util.List;
 @Validated
 public class FlightController {
     private final FlightService flightService;
+
     public FlightController(FlightService flightService) {
         this.flightService = flightService;
     }
@@ -28,13 +30,15 @@ public class FlightController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FlightResponseDto>> getAll() { return ResponseEntity.ok(flightService.getAll());
+    public ResponseEntity<List<FlightResponseDto>> getAll() {
+        return ResponseEntity.ok(flightService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FlightResponseDto> getById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(flightService.getById(id));
     }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable @Positive Long id) {

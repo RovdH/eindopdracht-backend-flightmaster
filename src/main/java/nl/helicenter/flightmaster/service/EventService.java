@@ -32,11 +32,11 @@ public class EventService {
     public EventResponseDto createEvent(EventRequestDto dto) {
         List<Helicopter> helicopters = helicopterRepository.findAllById(dto.getHelicopterIds());
 
-         if (helicopters.size() != dto.getHelicopterIds().size()) {
+        if (helicopters.size() != dto.getHelicopterIds().size()) {
             throw new EntityNotFoundException("Een of meer helikopters niet gevonden.");
         }
 
-         for (Helicopter heli : helicopters) {
+        for (Helicopter heli : helicopters) {
             boolean conflict = eventRepository.existsByEventDateAndHelicopters_Id(dto.getEventDate(), heli.getId());
             if (conflict) {
                 throw new IllegalArgumentException("Helicopter " + heli.getCallSign() + " is al geboekt op " + dto.getEventDate());
@@ -83,6 +83,7 @@ public class EventService {
         );
         return dto;
     }
+
     @Transactional
     public void delete(Long id) {
         if (!eventRepository.existsById(id)) {

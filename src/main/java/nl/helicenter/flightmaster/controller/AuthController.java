@@ -51,7 +51,12 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse("Bearer", jwt.generateAccessToken(user), jwt.generateRefreshToken(user)));
     }
 
-    public record AuthRequest(String email, String password) {}
-    public record RefreshRequest(String refreshToken) {}
-    public record AuthResponse(String tokenType, String accessToken, String refreshToken) {}
+    public record AuthRequest(String email, String password) {
+    }
+
+    public record RefreshRequest(String refreshToken) {
+    }
+
+    public record AuthResponse(String tokenType, String accessToken, String refreshToken) {
+    }
 }
