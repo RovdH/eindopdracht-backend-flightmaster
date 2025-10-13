@@ -1,7 +1,6 @@
 package nl.helicenter.flightmaster.controller;
 
 import nl.helicenter.flightmaster.dto.UserRequestDto;
-import nl.helicenter.flightmaster.security.JwtRequestFilter;
 import nl.helicenter.flightmaster.security.JwtUtil;
 import nl.helicenter.flightmaster.service.UserPhotoService;
 import nl.helicenter.flightmaster.service.UserService;
@@ -33,8 +32,6 @@ class UserControllerUnitTest {
     @Autowired
     MockMvc mvc;
 
-    @MockitoBean
-    JwtRequestFilter jwtRequestFilter;
     @MockitoBean
     JwtUtil jwtUtil;
 
