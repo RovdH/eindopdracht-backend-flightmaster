@@ -16,39 +16,92 @@ public class FlightResponseDto {
     private long seatsBooked;
     private int seatsAvailable;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getFlightNumber() { return flightNumber; }
-    public void setFlightNumber(String flightNumber) { this.flightNumber = flightNumber; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public LocalTime getStartTime() { return startTime; }
-    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+    public String getFlightNumber() {
+        return flightNumber;
+    }
 
-    public LocalTime getEndTime() { return endTime; }
-    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+    public void setFlightNumber(String flightNumber) {
+        this.flightNumber = flightNumber;
+    }
 
-    public Long getEventId() { return eventId; }
-    public void setEventId(Long eventId) { this.eventId = eventId; }
+    public LocalTime getStartTime() {
+        return startTime;
+    }
 
-    public String getHelicopterCallSign() { return helicopterCallSign; }
-    public void setHelicopterCallSign(String helicopterCallSign) { this.helicopterCallSign = helicopterCallSign; }
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
 
-    public double getFuelBefore() { return fuelBefore; }
-    public void setFuelBefore(double fuelBefore) { this.fuelBefore = fuelBefore; }
+    public LocalTime getEndTime() {
+        return endTime;
+    }
 
-    public double getFuelAfter() { return fuelAfter; }
-    public void setFuelAfter(double fuelAfter) { this.fuelAfter = fuelAfter; }
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
 
-    public int getCapacityTotal() { return capacityTotal; }
-    public void setCapacityTotal(int capacityTotal) { this.capacityTotal = capacityTotal; }
+    public Long getEventId() {
+        return eventId;
+    }
 
-    public long getSeatsBooked() { return seatsBooked; }
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getHelicopterCallSign() {
+        return helicopterCallSign;
+    }
+
+    public void setHelicopterCallSign(String helicopterCallSign) {
+        this.helicopterCallSign = helicopterCallSign;
+    }
+
+    public double getFuelBefore() {
+        return fuelBefore;
+    }
+
+    public void setFuelBefore(double fuelBefore) {
+        this.fuelBefore = fuelBefore;
+    }
+
+    public double getFuelAfter() {
+        return fuelAfter;
+    }
+
+    public void setFuelAfter(double fuelAfter) {
+        this.fuelAfter = fuelAfter;
+    }
+
+    public int getCapacityTotal() {
+        return capacityTotal;
+    }
+
+    public void setCapacityTotal(int capacityTotal) {
+        this.capacityTotal = capacityTotal;
+    }
+
+    public long getSeatsBooked() {
+        return seatsBooked;
+    }
+
     public void setSeatsBooked(long seatsBooked) {
         this.seatsBooked = seatsBooked;
     }
 
-    public int getSeatsAvailable() { return seatsAvailable; }
-    public void setSeatsAvailable(int seatsAvailable) { this.seatsAvailable = seatsAvailable; }
+    public int getSeatsAvailable() {
+        return seatsAvailable;
+    }
+
+    public void setSeatsAvailable(int seatsAvailable) {
+        this.seatsAvailable = seatsAvailable;
+    }
 
 }

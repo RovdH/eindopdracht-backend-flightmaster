@@ -45,6 +45,7 @@ public class EventResponseDto {
     public void setFlightTime(double flightTime) {
         this.flightTime = flightTime;
     }
+
     public LocalTime getStartTime() {
         return startTime;
     }
@@ -60,6 +61,7 @@ public class EventResponseDto {
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
+
     public List<String> getHelicopterCallSigns() {
         return helicopterCallSigns;
     }
