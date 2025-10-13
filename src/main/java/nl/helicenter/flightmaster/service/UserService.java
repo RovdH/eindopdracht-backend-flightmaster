@@ -28,18 +28,17 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String registerUser(UserRequestDto dto) {
+    public Long registerUser(UserRequestDto dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("E-mailadres is al in gebruik.");
         }
 
         User user = new User();
         user.setEmail(dto.getEmail());
-        var hashed = passwordEncoder.encode(dto.getPassword());
-        user.setPassword(hashed);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole());
-        userRepository.save(user);
-        return user.getEmail();
+        User saved = userRepository.save(user);
+        return saved.getId();
     }
 
     public List<User> getAllUsers() {
