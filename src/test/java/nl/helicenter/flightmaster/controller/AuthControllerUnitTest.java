@@ -29,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 class AuthControllerUnitTest {
 
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
 
     @MockitoBean
     AuthenticationManager authenticationManager;
@@ -38,7 +39,8 @@ class AuthControllerUnitTest {
     @MockitoBean
     JwtUtil jwt;
 
-    @MockitoBean UserService userService;
+    @MockitoBean
+    UserService userService;
 
     @Test
     void register_forcesRoleUSER_andReturns201EmptyBody() throws Exception {
@@ -48,8 +50,8 @@ class AuthControllerUnitTest {
                 .perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-          {"email":"rody@banaan.com","password":"Geheimpje123!","role":"ADMIN"}
-        """))
+                                  {"email":"rody@banaan.com","password":"Geheimpje123!","role":"ADMIN"}
+                                """))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/users/1"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -70,8 +72,8 @@ class AuthControllerUnitTest {
         mvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                  {"email":"rodybanaan","password":"!","role":""}
-                """))
+                                  {"email":"rodybanaan","password":"!","role":""}
+                                """))
                 .andExpect(status().isBadRequest())
                 .andDo(MockMvcResultHandlers.print());
     }

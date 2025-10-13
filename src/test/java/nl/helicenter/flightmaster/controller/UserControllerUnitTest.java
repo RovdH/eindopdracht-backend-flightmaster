@@ -30,13 +30,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 class UserControllerUnitTest {
 
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
 
-    @MockitoBean JwtRequestFilter jwtRequestFilter;
-    @MockitoBean JwtUtil jwtUtil;
+    @MockitoBean
+    JwtRequestFilter jwtRequestFilter;
+    @MockitoBean
+    JwtUtil jwtUtil;
 
-    @MockitoBean UserService userService;
-    @MockitoBean UserPhotoService userPhotoService;
+    @MockitoBean
+    UserService userService;
+    @MockitoBean
+    UserPhotoService userPhotoService;
 
     @Test
     void createUser_asAdmin_returns201_andSetsRoleFromPost() throws Exception {
@@ -47,8 +52,8 @@ class UserControllerUnitTest {
                 .perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                  {"email":"pilot@flightmaster.nl","password":"Bananenpannekoek1!","role":"PILOT"}
-                """))
+                                  {"email":"pilot@flightmaster.nl","password":"Bananenpannekoek1!","role":"PILOT"}
+                                """))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
@@ -68,11 +73,11 @@ class UserControllerUnitTest {
     @Test
     void createUser_invalidPayload_returns400() throws Exception {
         MvcResult result = this.mvc
-        .perform(post("/users")
+                .perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                  {"email":"", "password":"", "role":""}
-                """))
+                                  {"email":"", "password":"", "role":""}
+                                """))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
