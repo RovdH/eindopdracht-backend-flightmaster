@@ -144,14 +144,25 @@ Alle tests draaien via Maven:
 
 ---
 
-## Gebruikers en autorisatieniveaus
+## Default Gebruikers
 Bij de start wordt er een Admin toegevoegd om de applicatie te kunnen gebruiken (via `data.sql`):
 
 | Gebruiker | Wachtwoord | Rol  | Toegang |
 |------------|-------------|------|----------|
 | `admin@flightmaster.nl` | `Geheim123!` | ADMIN | Alle endpoints |
 
-**Let op:**Verwijder na eerste startup de Admin insert regels uit data.sql of pas het wachtwoord aan.
+**Let op:** Verwijder na eerste startup de Admin insert regels uit data.sql of pas het wachtwoord aan.
+Voeg eerst een extra Admin aan Flight Master toe met eigen credentials. Delete daarna de Default Admin en het data.sql bestand uit de repository.
+
+## Autorisatieniveaus
+
+| Gebruikersrol | Toegang                      |
+|---------------|------------------------------|
+| ADMIN         | Alle endpoints               |
+| USER          | Passenger & Flight endpoints |
+| PILOT         | PDF generatie endpoint       |
+| GUEST         | Register endpoint            |
+
 
 Autorisatie is geregeld via **JWT-tokens**:
 1. Registreer of log in via `/auth/register` of `/auth/login`.
