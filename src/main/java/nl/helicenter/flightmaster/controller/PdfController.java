@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/pdf")
 @Validated
 public class PdfController {
 
@@ -22,18 +22,18 @@ public class PdfController {
         this.pdfService = pdfService;
     }
 
-    @PostMapping("/events/{eventId}/pdfs")
+    @PostMapping("/{eventId}/generate")
     public ResponseEntity<PdfResponseDto> generate(@PathVariable @Positive Long eventId) {
         var dto = pdfService.generatePassengerList(eventId);
         return ResponseEntity.status(201).body(dto);
     }
 
-    @GetMapping("/events/{eventId}/pdfs")
+    @GetMapping("/{eventId}/list")
     public ResponseEntity<List<PdfResponseDto>> list(@PathVariable @Positive Long eventId) {
         return ResponseEntity.ok(pdfService.listByEvent(eventId));
     }
 
-    @GetMapping("/pdfs/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<PdfResponseDto> getMeta(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(pdfService.getMeta(id));
     }

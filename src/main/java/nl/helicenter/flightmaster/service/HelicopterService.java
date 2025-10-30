@@ -42,7 +42,7 @@ public class HelicopterService {
 
     public HelicopterResponseDto getHelicopterById(Long id) {
         Helicopter helicopter = helicopterRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Helicopter met id " + id + " niet gevonden."));
+                .orElseThrow(() -> new EntityNotFoundException("Helikopter met id " + id + " niet gevonden."));
         return mapToResponseDto(helicopter);
     }
 
@@ -61,7 +61,7 @@ public class HelicopterService {
     @Transactional
     public void delete(Long id) {
         if (!helicopterRepository.existsById(id)) {
-            throw new EntityNotFoundException("Helicopter with id" + id + " not found");
+            throw new EntityNotFoundException("Helikopter met id " + id + " niet gevonden");
         }
         helicopterRepository.deleteById(id);
     }

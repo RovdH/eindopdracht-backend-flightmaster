@@ -10,15 +10,13 @@
     </parent>
     <groupId>nl.helicenter</groupId>
     <artifactId>flightmaster</artifactId>
-    <version>0.0.1-initial</version>
-    <name>flightmaster</name>
-    <description>flightmaster heliflight events.</description>
-    <url/>
+    <version>1.0</version>
+    <name>Flight Master</name>
+    <description>Flight Master helicopter flight events.</description>
     <licenses>
         <license/>
     </licenses>
     <developers>
-        <developer/>
     </developers>
     <scm>
         <connection/>

@@ -33,7 +33,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Long>> register(@Valid @RequestBody UserRequestDto dto) {
         dto.setRole("USER");
         Long id = userService.registerUser(dto);
-        return ResponseEntity.created(URI.create("/users/" + id)).body(Map.of("id", id));
+        return ResponseEntity.created(URI.create("/users/" + id)).body(Map.of("Gebruiker is geregistreerd met id", id));
     }
 
     @PostMapping("/login")

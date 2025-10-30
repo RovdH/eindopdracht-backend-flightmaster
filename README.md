@@ -10,8 +10,9 @@
 6. [Configuratie en omgevingsvariabelen](#configuratie-en-omgevingsvariabelen)
 7. [Tests uitvoeren](#tests-uitvoeren)
 8. [Gebruikers en autorisatieniveaus](#gebruikers-en-autorisatieniveaus)
-9. [Overige commando’s](#overige-commando’s)
-10. [Bronnen](#bronnen)
+9. [Default Gebruikers](#default-gebruikers)
+10. [Stappenplan na eerste login](#stappenplan-na-eerste-login)
+11. [Bronnen](#bronnen)
 
 ---
 
@@ -116,7 +117,7 @@ src
 
 ## Configuratie en omgevingsvariabelen
 Standaard werkt de app zonder extra configuratie dankzij `application.properties`.  
-Belangrijkste instellingen:
+Instellingen zoals:
 
 ```properties
 spring.datasource.url=jdbc:h2:mem:flightmaster
@@ -126,6 +127,9 @@ spring.h2.console.enabled=true
 jwt.secret=SecretKeyForJWTGeneration
 jwt.expiration=3600000
 ```
+**Controleer en match de database settings**
+In de application.properties vind je ook de huidige database connectie gegevens. Gebruik deze voor je eigen database of pas deze aan naar eigen voorkeur.
+
 
 **Optioneel:** wijzig de `jwt.secret` voor productie.  
 De H2-console is bereikbaar op `http://localhost:8080/h2-console` (JDBC URL = `jdbc:h2:mem:flightmaster`).
@@ -143,16 +147,6 @@ Alle tests draaien via Maven:
   Na het draaien verschijnt de test-samenvatting in de terminal.
 
 ---
-
-## Default Gebruikers
-Bij de start wordt er een Admin toegevoegd om de applicatie te kunnen gebruiken (via `data.sql`):
-
-| Gebruiker | Wachtwoord | Rol  | Toegang |
-|------------|-------------|------|----------|
-| `admin@flightmaster.nl` | `Geheim123!` | ADMIN | Alle endpoints |
-
-**Let op:** Verwijder na eerste startup de Admin insert regels uit data.sql of pas het wachtwoord aan.
-Voeg eerst een extra Admin aan Flight Master toe met eigen credentials. Delete daarna de Default Admin en het data.sql bestand uit de repository.
 
 ## Autorisatieniveaus
 
@@ -173,6 +167,55 @@ Autorisatie is geregeld via **JWT-tokens**:
    ```
 
 ---
+## Default Gebruikers
+Bij het opstarten van de applicatie wordt er automatisch een default Admin toegevoegd om de applicatie te kunnen gebruiken:
+
+| Gebruiker | Wachtwoord | Rol  | Toegang |
+|------------|-------------|------|----------|
+| `admin@flightmaster.nl` | `Geheim123!` | ADMIN | Alle endpoints |
+
+**Let op:** Verwijder na eerste startup de Admin insert regels uit data.sql of pas het wachtwoord aan.
+Voeg eerst een extra Admin aan Flight Master toe met eigen credentials. Delete daarna de Default Admin en het data.sql bestand uit de repository.
+
+---
+
+## Stappenplan na eerste login
+1. Log in met de default Admin op endpoint: **/auth/login** 
+   1. Gebruik in de body:
+   ```bash
+   {
+     "email": "admin@flightmaster.nl"
+     "password": "Geheim123!"
+   }
+   ```
+   2. Kopieer de token uit de respons van bovenstaand request.
+
+2. Voeg een eigen Admin account toe.
+   1. Endpoint: **POST /users**
+   2. Headers: 
+   ```bash
+   {
+     Authorization: Bearer <jouw-token>
+     Content-Type: application/json
+   }
+   ```
+   3. Body
+   ```bash
+   {
+     "email": "jouw@email.nl"
+     "password": "Gebruik een sterk wachtwoord"
+     "role": "ADMIN"
+   }
+   ```
+3. Verwijder de default Admin
+   1. Zoek het ID van de default Admin via **GET /users**.
+   2. Verwijder het met de **DELETE /users/{id}** endpoint.
+4. Verwijder of pas **data.sql** aan.
+   1. Verwijder de regel met de default Admin **INSERT STATEMENT**
+
+**Alleen het zelf aangemaakte Admin beheeraccount blijft actief en bij een komende applicatie startup, voegt de applicatie geen extra admin meer toe**
+
+---
 
 ## Overige commando’s
 | Doel | Commando |
@@ -185,3 +228,5 @@ Autorisatie is geregeld via **JWT-tokens**:
 ## Bronnen
 - NOVI Hogeschool EdHub Leerlijn
 - Documentatie “Eindopdracht Backend V4.1”  
+- Maven.apache.org "Tools Wrapper"
+- Markdownguide.org

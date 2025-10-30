@@ -37,18 +37,18 @@ public class PassengerService {
     @Transactional
     public PassengerResponseDto create(PassengerRequestDto dto) {
 
-        if (dto == null) throw new IllegalArgumentException("Request body is empty");
+        if (dto == null) throw new IllegalArgumentException("Request body is leeg");
         Flight flight = flightRepository.findById(dto.getFlightId())
-                .orElseThrow(() -> new EntityNotFoundException("Flight " + dto.getFlightId() + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Flight " + dto.getFlightId() + " is niet gevonden of bestaat niet"));
 
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User " + dto.getUserId() + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User " + dto.getUserId() + " is niet gevonden of bestaat niet"));
 
         long currentPassengers = passengerRepository.countByFlight_Id(flight.getId());
         int capacity = flight.getHelicopter().getCapacity();
 
         if (currentPassengers >= capacity) {
-            throw new IllegalStateException("Flight is full");
+            throw new IllegalStateException("Flight is volgeboekt");
         }
 
         Passenger passenger = mapToEntity(dto, flight, user);
@@ -69,7 +69,7 @@ public class PassengerService {
     @Transactional
     public List<PassengerResponseDto> createBulk(List<PassengerRequestDto> requests) {
         if (requests == null || requests.isEmpty()) {
-            throw new IllegalArgumentException("Request list is empty");
+            throw new IllegalArgumentException("Request list is leeg");
         }
 
         Map<Long, List<PassengerRequestDto>> byFlight = requests.stream()
@@ -82,14 +82,14 @@ public class PassengerService {
             Long flightId = entry.getKey();
             Flight flight = flights.get(flightId);
             if (flight == null) {
-                throw new EntityNotFoundException("Flight " + flightId + " not found");
+                throw new EntityNotFoundException("Flight " + flightId + " is niet gevonden of bestaat niet");
             }
             long current = passengerRepository.countByFlight_Id(flightId);
             int capacity = flight.getHelicopter().getCapacity();
             int incoming = entry.getValue().size();
             if (current + incoming > capacity) {
-                throw new IllegalStateException("Flight " + flightId + " is full: capacity=" + capacity +
-                        ", alreadyBooked=" + current + ", requested=" + incoming);
+                throw new IllegalStateException("Flight " + flightId + " is volgeboekt: stoelen=" + capacity +
+                        ", Bezet=" + current + ", Gevraagd=" + incoming);
             }
         }
 
@@ -102,7 +102,7 @@ public class PassengerService {
             Flight flight = flights.get(dto.getFlightId());
             User user = users.get(dto.getUserId());
             if (user == null) {
-                throw new EntityNotFoundException("User " + dto.getUserId() + " not found");
+                throw new EntityNotFoundException("User " + dto.getUserId() + " is niet gevonden of bestaat niet");
             }
             Passenger passenger = mapToEntity(dto, flight, user);
             toSave.add(passenger);
@@ -115,14 +115,14 @@ public class PassengerService {
     @Transactional(readOnly = true)
     public PassengerResponseDto getById(Long passengerId) {
         Passenger passenger = passengerRepository.findById(passengerId)
-                .orElseThrow(() -> new EntityNotFoundException("Passenger " + passengerId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Passenger " + passengerId + "is niet gevonden of bestaat niet"));
         return toResponse(passenger);
     }
 
     @Transactional
     public void delete(Long passengerId) {
         if (!passengerRepository.existsById(passengerId)) {
-            throw new EntityNotFoundException("Passenger " + passengerId + " not found");
+            throw new EntityNotFoundException("Passenger " + passengerId + " is niet gevonden of bestaat niet");
         }
         passengerRepository.deleteById(passengerId);
     }
