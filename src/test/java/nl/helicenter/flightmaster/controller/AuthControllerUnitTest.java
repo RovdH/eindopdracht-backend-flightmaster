@@ -43,7 +43,7 @@ class AuthControllerUnitTest {
     UserService userService;
 
     @Test
-    void register_forcesRoleUSER_andReturns201EmptyBody() throws Exception {
+    void register_andReturns201() throws Exception {
         willReturn(1L).given(userService).registerUser(any(UserRequestDto.class));
 
         MvcResult result = this.mvc
@@ -68,7 +68,7 @@ class AuthControllerUnitTest {
     }
 
     @Test
-    void register_invalidPayload_returns400() throws Exception {
+    void register_invalid_returns400() throws Exception {
         mvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""

@@ -24,7 +24,7 @@ public class UsersEndpointAuthIntegrationTest {
     MockMvc mvc;
 
     @Test
-    void authRegister_permitAll_created_withoutAuth_andReturnsIdAndLocation() throws Exception {
+    void authRegister_ReturnsIdAndLocation() throws Exception {
         MvcResult result = this.mvc
                 .perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)

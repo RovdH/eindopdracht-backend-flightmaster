@@ -60,7 +60,7 @@ class UserServiceTest {
     }
 
     @Test
-    void registerUser_emailAlreadyExists_throws() {
+    void registerUser_emailAlreadyExists() {
         UserRequestDto dto = new UserRequestDto();
         dto.setEmail("henk@voorbeeld.nl");
         dto.setPassword("Geheimpje123!");
@@ -97,7 +97,7 @@ class UserServiceTest {
     }
 
     @Test
-    void assignPhotoToUser_reusesExistingPhoto() {
+    void assignPhotoToUser_ExistingPhoto() {
         Long userId = 1L;
         String fileName = "test.jpg";
 
@@ -118,14 +118,14 @@ class UserServiceTest {
     }
 
     @Test
-    void getPhotoFromUser_userNotFound_throws() {
+    void getPhotoFromUser_userNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
         Assertions.assertThrows(EntityNotFoundException.class,
                 () -> userService.getPhotoFromUser(99L));
     }
 
     @Test
-    void getPhotoFromUser_noPhoto_throws() {
+    void getPhotoFromUser_noPhoto() {
         User user = new User();
         user.setId(10L);
         when(userRepository.findById(10L)).thenReturn(Optional.of(user));

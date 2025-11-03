@@ -38,7 +38,7 @@ public class PdfController {
         return ResponseEntity.ok(pdfService.getMeta(id));
     }
 
-    @GetMapping("/pdfs/{id}/download")
+    @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> download(@PathVariable @Positive Long id) {
         PdfResponseDto meta = pdfService.getMeta(id);
         byte[] bytes = pdfService.getBytes(id);

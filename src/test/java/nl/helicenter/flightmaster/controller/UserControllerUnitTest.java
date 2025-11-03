@@ -41,7 +41,7 @@ class UserControllerUnitTest {
     UserPhotoService userPhotoService;
 
     @Test
-    void createUser_asAdmin_returns201_andSetsRoleFromPost() throws Exception {
+    void createUser_asAdmin_returns201_andSetRole() throws Exception {
 
         given(userService.registerUser(any(UserRequestDto.class))).willReturn(123L);
 
@@ -68,7 +68,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    void createUser_invalidPayload_returns400() throws Exception {
+    void createUser_invalid_returns400() throws Exception {
         MvcResult result = this.mvc
                 .perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
