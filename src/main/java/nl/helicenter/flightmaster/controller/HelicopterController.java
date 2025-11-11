@@ -42,12 +42,12 @@ public class HelicopterController {
         return ResponseEntity.ok(helicopterService.getHelicopterById(id));
     }
 
-    @PatchMapping("update/{id}")
-    public ResponseEntity<HelicopterResponseDto> patchHelicopter(
-            @PathVariable Long id,
-            @RequestBody HelicopterUpdateDto dto) {
-            helicopterService.patch(id, dto);
-        return ResponseEntity.ok(helicopterService.getHelicopterById(id));
+    @PatchMapping("/{id}")
+    public ResponseEntity<HelicopterResponseDto> patch(
+            @PathVariable @Positive Long id,
+            @RequestBody @Valid HelicopterUpdateDto dto) {
+        HelicopterResponseDto updated = helicopterService.patch(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

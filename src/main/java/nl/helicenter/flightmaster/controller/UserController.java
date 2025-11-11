@@ -3,6 +3,7 @@ package nl.helicenter.flightmaster.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
+import nl.helicenter.flightmaster.dto.UserResponseDto;
 import nl.helicenter.flightmaster.dto.UserUpdateDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.service.UserPhotoService;
@@ -99,10 +100,15 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> patchUser(@PathVariable Long id,
+    public ResponseEntity<UserResponseDto> patchUser(@PathVariable Long id,
                                           @RequestBody UserUpdateDto dto) {
         User updated = userService.patch(id, dto);
-        return ResponseEntity.ok(updated);
+        UserResponseDto body = new UserResponseDto(
+                updated.getId(),
+                updated.getEmail(),
+                updated.getRole()
+        );
+        return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{id}")

@@ -61,7 +61,7 @@ public class HelicopterService {
     }
 
     @Transactional
-    public Helicopter patch(Long id, HelicopterUpdateDto dto) {
+    public HelicopterResponseDto patch(Long id, HelicopterUpdateDto dto) {
         Helicopter helicopter = helicopterRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Helicopter " + id + " niet gevonden"));
 
@@ -72,7 +72,8 @@ public class HelicopterService {
         applyIfPresent(dto.getFuelUsage(), helicopter::setFuelUsage);
         applyIfPresent(dto.getAvailable(), helicopter::setAvailable);
 
-        return helicopterRepository.save(helicopter);
+        Helicopter saved = helicopterRepository.save(helicopter);
+        return mapToResponseDto(saved);
     }
 
     @Transactional
