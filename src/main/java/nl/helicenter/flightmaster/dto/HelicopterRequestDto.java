@@ -8,7 +8,7 @@ public class HelicopterRequestDto {
     @Size(max = 6, message = "Callsign mag max 6 tekens zijn")
     private String callSign;
 
-    @NotBlank(message = "Type is verplicht")
+    @NotBlank(message = "Helicopter Type is verplicht")
     private String type;
 
     @Min(value = 2, message = "Minimaal 2 zitplaatsen")
