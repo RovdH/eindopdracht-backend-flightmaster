@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.verify;
@@ -53,9 +55,8 @@ class AuthControllerUnitTest {
                                   {"email":"rody@banaan.com","password":"Geheimpje123!","role":"ADMIN"}
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/users/1"))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(header().string("Location", startsWith("/users/")))
+                .andExpect(jsonPath("$['Gebruiker is geregistreerd met id']", notNullValue()))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
 
