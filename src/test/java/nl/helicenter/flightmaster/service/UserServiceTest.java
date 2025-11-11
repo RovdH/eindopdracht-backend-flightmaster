@@ -25,11 +25,16 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock UserRepository userRepository;
-    @Mock PasswordEncoder passwordEncoder;
-    @Mock UserPhotoService userPhotoService;
-    @Mock FileUploadRepository fileUploadRepository;
-    @InjectMocks UserService userService;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    PasswordEncoder passwordEncoder;
+    @Mock
+    UserPhotoService userPhotoService;
+    @Mock
+    FileUploadRepository fileUploadRepository;
+    @InjectMocks
+    UserService userService;
 
     @Test
     void createUser_mapsEncryptsAndSaves() {
@@ -142,7 +147,7 @@ class UserServiceTest {
         u.setId(id);
         u.setUserPhoto(up);
 
-      Resource mockRes = mock(Resource.class);
+        Resource mockRes = mock(Resource.class);
 
         when(userRepository.findById(id)).thenReturn(Optional.of(u));
         when(userPhotoService.downLoadFile(fileName)).thenReturn(mockRes);
