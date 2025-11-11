@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.HelicopterRequestDto;
 import nl.helicenter.flightmaster.dto.HelicopterResponseDto;
+import nl.helicenter.flightmaster.dto.HelicopterUpdateDto;
+import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.service.HelicopterService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -38,6 +40,14 @@ public class HelicopterController {
     @GetMapping("/{id}")
     public ResponseEntity<HelicopterResponseDto> getById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(helicopterService.getHelicopterById(id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<HelicopterResponseDto> patch(
+            @PathVariable @Positive Long id,
+            @RequestBody @Valid HelicopterUpdateDto dto) {
+        HelicopterResponseDto updated = helicopterService.patch(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

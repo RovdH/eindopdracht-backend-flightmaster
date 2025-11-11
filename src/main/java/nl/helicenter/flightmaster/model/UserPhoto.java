@@ -15,7 +15,6 @@ public class UserPhoto {
     public UserPhoto(String fileName) {
         this.fileName = fileName;
     }
-
     public String getFileName() {
         return fileName;
     }

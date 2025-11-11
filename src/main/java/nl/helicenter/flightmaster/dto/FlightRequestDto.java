@@ -2,7 +2,11 @@ package nl.helicenter.flightmaster.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class FlightRequestDto {
 
     @NotNull(message = "EventId is verplicht")
@@ -12,20 +16,4 @@ public class FlightRequestDto {
     @NotNull(message = "HelicopterId is verplicht")
     @Positive(message = "HelicopterId moet > 0 zijn")
     private Long helicopterId;
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
-    }
-
-    public Long getHelicopterId() {
-        return helicopterId;
-    }
-
-    public void setHelicopterId(Long helicopterId) {
-        this.helicopterId = helicopterId;
-    }
 }

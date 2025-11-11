@@ -3,6 +3,7 @@ package nl.helicenter.flightmaster.service;
 import jakarta.persistence.EntityNotFoundException;
 import nl.helicenter.flightmaster.dto.PassengerRequestDto;
 import nl.helicenter.flightmaster.dto.PassengerResponseDto;
+import nl.helicenter.flightmaster.dto.PassengerUpdateDto;
 import nl.helicenter.flightmaster.model.Flight;
 import nl.helicenter.flightmaster.model.Passenger;
 import nl.helicenter.flightmaster.model.User;
@@ -17,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+
+import static nl.helicenter.flightmaster.utils.PatchUtil.applyIfPresent;
 
 
 @Service
@@ -117,6 +120,21 @@ public class PassengerService {
         Passenger passenger = passengerRepository.findById(passengerId)
                 .orElseThrow(() -> new EntityNotFoundException("Passenger " + passengerId + "is niet gevonden of bestaat niet"));
         return toResponse(passenger);
+    }
+
+    @Transactional
+    public PassengerResponseDto patch(Long passengerId, PassengerUpdateDto dto) {
+        Passenger passenger = passengerRepository.findById(passengerId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Passenger " + passengerId + " is niet gevonden of bestaat niet"));
+
+        applyIfPresent(dto.getFirstName(), passenger::setFirstName);
+        applyIfPresent(dto.getLastName(), passenger::setLastName);
+        applyIfPresent(dto.getEmail(), passenger::setEmail);
+        applyIfPresent(dto.getWeightKg(), passenger::setWeight);
+
+        Passenger saved = passengerRepository.save(passenger);
+        return toResponse(saved);
     }
 
     @Transactional

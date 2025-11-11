@@ -1,7 +1,12 @@
 package nl.helicenter.flightmaster.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.Instant;
 
+@Getter
+@Setter
 public class PdfResponseDto {
     private Long id;
     private Long eventId;
@@ -9,52 +14,4 @@ public class PdfResponseDto {
     private String fileExtension;
     private long sizeBytes;
     private Instant createdAt;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileExtension() {
-        return fileExtension;
-    }
-
-    public void setFileExtension(String fileExtension) {
-        this.fileExtension = fileExtension;
-    }
-
-    public long getSizeBytes() {
-        return sizeBytes;
-    }
-
-    public void setSizeBytes(long sizeBytes) {
-        this.sizeBytes = sizeBytes;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
 }

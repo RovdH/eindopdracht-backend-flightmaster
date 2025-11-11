@@ -50,7 +50,7 @@ public class PdfService {
                 .toList();
 
         byte[] pdfBytes = createPdfBytes(event, flights);
-        String fileName = "Passagierslijst_" + event.getLocation() + "_" + event.getDate() + ".pdf";
+        String fileName = "Passagierslijst_" + event.getLocation() + "_" + event.getEventDate() + ".pdf";
 
 
         Pdf pdf = new Pdf();
@@ -70,14 +70,14 @@ public class PdfService {
             doc.open();
 
             var title = new Paragraph(
-                    "Passagierslijst – " + event.getDate() + " @ " + event.getLocation(),
+                    "Passagierslijst – " + event.getEventDate() + " @ " + event.getLocation(),
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16)
             );
             title.setSpacingAfter(12f);
             doc.add(title);
 
             var meta = new Paragraph(
-                    "Eventdatum: " + event.getDate() + "\nLocatie: " + event.getLocation(),
+                    "Eventdatum: " + event.getEventDate() + "\nLocatie: " + event.getLocation(),
                     FontFactory.getFont(FontFactory.HELVETICA, 11)
             );
             meta.setSpacingAfter(12f);

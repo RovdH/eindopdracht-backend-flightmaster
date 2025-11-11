@@ -3,6 +3,7 @@ package nl.helicenter.flightmaster.controller;
 import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.PassengerRequestDto;
 import nl.helicenter.flightmaster.dto.PassengerResponseDto;
+import nl.helicenter.flightmaster.dto.PassengerUpdateDto;
 import nl.helicenter.flightmaster.service.PassengerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -51,6 +52,14 @@ public class PassengerController {
     public ResponseEntity<PassengerResponseDto> getById(@PathVariable @Positive Long id) {
         PassengerResponseDto passengerResponseDto = passengerService.getById(id);
         return ResponseEntity.ok(passengerResponseDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<PassengerResponseDto> patch(
+            @PathVariable @Positive Long id,
+            @RequestBody @Valid PassengerUpdateDto dto) {
+        PassengerResponseDto updated = passengerService.patch(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

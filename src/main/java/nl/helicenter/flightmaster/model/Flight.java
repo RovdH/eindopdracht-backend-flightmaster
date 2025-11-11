@@ -1,10 +1,14 @@
 package nl.helicenter.flightmaster.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalTime;
 
 @Entity
+@Getter
+@Setter
 @Table(
         name = "flights",
         uniqueConstraints = {
@@ -38,61 +42,5 @@ public class Flight {
     private double fuelAfter;
 
     public Flight() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFlightNumber() {
-        return flightNumber;
-    }
-
-    public void setFlightNumber(String flightNumber) {
-        this.flightNumber = flightNumber;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
-    }
-
-    public Helicopter getHelicopter() {
-        return helicopter;
-    }
-
-    public void setHelicopter(Helicopter helicopter) {
-        this.helicopter = helicopter;
-    }
-
-    public double getFuelBefore() {
-        return fuelBefore;
-    }
-
-    public void setFuelBefore(double fuelBefore) {
-        this.fuelBefore = fuelBefore;
-    }
-
-    public double getFuelAfter() {
-        return fuelAfter;
-    }
-
-    public void setFuelAfter(double fuelAfter) {
-        this.fuelAfter = fuelAfter;
     }
 }
