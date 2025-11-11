@@ -3,6 +3,7 @@ package nl.helicenter.flightmaster.service;
 import jakarta.persistence.EntityNotFoundException;
 import nl.helicenter.flightmaster.dto.PassengerRequestDto;
 import nl.helicenter.flightmaster.dto.PassengerResponseDto;
+import nl.helicenter.flightmaster.dto.PassengerUpdateDto;
 import nl.helicenter.flightmaster.model.Flight;
 import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.model.Passenger;
@@ -30,7 +31,6 @@ class PassengerServiceTest {
     FlightRepository flightRepository;
     @Mock
     UserRepository userRepository;
-
     @InjectMocks
     PassengerService passengerService;
 
@@ -87,7 +87,7 @@ class PassengerServiceTest {
     void create_nullRequest_throwsIllegalArgument() {
         assertThatThrownBy(() -> passengerService.create(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("empty");
+                .hasMessageContaining("leeg");
     }
 
     @Test
@@ -104,7 +104,7 @@ class PassengerServiceTest {
 
         assertThatThrownBy(() -> passengerService.create(dto))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Flight 666 not found");
+                .hasMessageContaining("Flight 666 is niet gevonden of bestaat niet");
     }
 
     @Test
@@ -129,7 +129,7 @@ class PassengerServiceTest {
 
         assertThatThrownBy(() -> passengerService.create(dto))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("User 999 not found");
+                .hasMessageContaining("User 999 is niet gevonden of bestaat niet");
     }
 
     @Test
@@ -158,7 +158,7 @@ class PassengerServiceTest {
 
         assertThatThrownBy(() -> passengerService.create(dto))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Flight is full");
+                .hasMessageContaining("Flight is volgeboekt");
     }
 
 
@@ -166,10 +166,10 @@ class PassengerServiceTest {
     void createBulk_nullOrEmpty_throwsIllegalArgument() {
         assertThatThrownBy(() -> passengerService.createBulk(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("empty");
+                .hasMessageContaining("leeg");
         assertThatThrownBy(() -> passengerService.createBulk(List.of()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("empty");
+                .hasMessageContaining("leeg");
     }
 
     @Test
@@ -186,7 +186,7 @@ class PassengerServiceTest {
 
         assertThatThrownBy(() -> passengerService.createBulk(List.of(dto1)))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Flight 100 not found");
+                .hasMessageContaining("Flight 100 is niet gevonden of bestaat niet");
     }
 
     @Test
@@ -219,8 +219,8 @@ class PassengerServiceTest {
 
         assertThatThrownBy(() -> passengerService.createBulk(List.of(dto1, dto2)))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("is full")
-                .hasMessageContaining("requested=2");
+                .hasMessageContaining("is volgeboekt")
+                .hasMessageContaining("Gevraagd=2");
     }
 
     @Test
@@ -246,7 +246,7 @@ class PassengerServiceTest {
 
         assertThatThrownBy(() -> passengerService.createBulk(List.of(dto1)))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("User 1 not found");
+                .hasMessageContaining("User 1 is niet gevonden of bestaat niet");
     }
 
     @Test
@@ -357,7 +357,98 @@ class PassengerServiceTest {
         when(passengerRepository.findById(404L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> passengerService.getById(404L))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Passenger 404 not found");
+                .hasMessageContaining("Passenger 404 is niet gevonden of bestaat niet");
+    }
+
+    @Test
+    void patch_updatesSelectedFields() {
+        Helicopter heli = new Helicopter(); heli.setCapacity(4);
+        Flight flight = new Flight(); flight.setId(77L); flight.setHelicopter(heli);
+        User user = new User(); user.setId(9L);
+
+        Passenger existing = new Passenger();
+        existing.setId(7L);
+        existing.setFirstName("Jan");
+        existing.setLastName("Jansen");
+        existing.setEmail("jan@ziggo.nl");
+        existing.setWeight(70.0);
+        existing.setFlight(flight);
+        existing.setUser(user);
+
+        when(passengerRepository.findById(7L)).thenReturn(Optional.of(existing));
+        when(passengerRepository.save(any(Passenger.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        PassengerUpdateDto dto = new PassengerUpdateDto();
+        dto.setLastName("Janssen");
+        dto.setWeightKg(75.5);
+
+        PassengerResponseDto resp = passengerService.patch(7L, dto);
+
+        assertThat(resp.getId()).isEqualTo(7L);
+        assertThat(resp.getFirstName()).isEqualTo("Jan");
+        assertThat(resp.getLastName()).isEqualTo("Janssen");
+        assertThat(resp.getEmail()).isEqualTo("jan@ziggo.nl");
+        assertThat(resp.getWeightKg()).isEqualTo(75.5);
+        assertThat(resp.getFlightId()).isEqualTo(77L);
+        assertThat(resp.getUserId()).isEqualTo(9L);
+
+        ArgumentCaptor<Passenger> captor = ArgumentCaptor.forClass(Passenger.class);
+        verify(passengerRepository).save(captor.capture());
+        Passenger saved = captor.getValue();
+        assertThat(saved.getFirstName()).isEqualTo("Jan");
+        assertThat(saved.getLastName()).isEqualTo("Janssen");
+        assertThat(saved.getWeight()).isEqualTo(75.5);
+    }
+
+    @Test
+    void patch_nothingFilledIn_keepsValues() {
+        Helicopter heli = new Helicopter(); heli.setCapacity(4);
+        Flight flight = new Flight(); flight.setId(11L); flight.setHelicopter(heli);
+        User user = new User(); user.setId(22L);
+
+        Passenger existing = new Passenger();
+        existing.setId(8L);
+        existing.setFirstName("Piet");
+        existing.setLastName("Peeters");
+        existing.setEmail("piet@ziggo.nl");
+        existing.setWeight(80.0);
+        existing.setFlight(flight);
+        existing.setUser(user);
+
+        when(passengerRepository.findById(8L)).thenReturn(Optional.of(existing));
+        when(passengerRepository.save(any(Passenger.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        PassengerUpdateDto dto = new PassengerUpdateDto();
+
+        PassengerResponseDto resp = passengerService.patch(8L, dto);
+
+        assertThat(resp.getId()).isEqualTo(8L);
+        assertThat(resp.getFirstName()).isEqualTo("Piet");
+        assertThat(resp.getLastName()).isEqualTo("Peeters");
+        assertThat(resp.getEmail()).isEqualTo("piet@ziggo.nl");
+        assertThat(resp.getWeightKg()).isEqualTo(80.0);
+        assertThat(resp.getFlightId()).isEqualTo(11L);
+        assertThat(resp.getUserId()).isEqualTo(22L);
+
+        ArgumentCaptor<Passenger> captor = ArgumentCaptor.forClass(Passenger.class);
+        verify(passengerRepository).save(captor.capture());
+        Passenger saved = captor.getValue();
+        assertThat(saved.getFirstName()).isEqualTo("Piet");
+        assertThat(saved.getLastName()).isEqualTo("Peeters");
+        assertThat(saved.getEmail()).isEqualTo("piet@ziggo.nl");
+        assertThat(saved.getWeight()).isEqualTo(80.0);
+    }
+
+    @Test
+    void patch_notFound_throwsEntityNotFound() {
+        when(passengerRepository.findById(123L)).thenReturn(Optional.empty());
+
+        PassengerUpdateDto dto = new PassengerUpdateDto();
+        dto.setFirstName("Nieuw");
+
+        assertThatThrownBy(() -> passengerService.patch(123L, dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("Passenger 123 is niet gevonden of bestaat niet");
     }
 
     @Test
@@ -365,7 +456,7 @@ class PassengerServiceTest {
         when(passengerRepository.existsById(66L)).thenReturn(false);
         assertThatThrownBy(() -> passengerService.delete(66L))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Passenger 66 not found");
+                .hasMessageContaining("Passenger 66 is niet gevonden of bestaat niet");
         verify(passengerRepository, never()).deleteById(anyLong());
     }
 
