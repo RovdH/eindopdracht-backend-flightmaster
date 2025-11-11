@@ -1,6 +1,7 @@
 package nl.helicenter.flightmaster.service;
 
 import nl.helicenter.flightmaster.dto.UserRequestDto;
+import nl.helicenter.flightmaster.dto.UserUpdateDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +13,8 @@ import nl.helicenter.flightmaster.repository.FileUploadRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static nl.helicenter.flightmaster.utils.PatchUtil.applyIfPresent;
 
 @Service
 public class UserService {
@@ -76,6 +79,27 @@ public class UserService {
         user.setUserPhoto(null);
         userRepository.save(user);
         userPhotoService.deleteFile(fileName);
+    }
+
+    @Transactional
+    public User patch(Long id, UserUpdateDto dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User " + id + " niet gevonden"));
+
+        if (dto.getEmail() != null && !dto.getEmail().equalsIgnoreCase(user.getEmail())) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw new IllegalArgumentException("E-mailadres is al in gebruik.");
+            }
+            user.setEmail(dto.getEmail());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        applyIfPresent(dto.getRole(), user::setRole);
+
+        return userRepository.save(user);
     }
 
     @Transactional
