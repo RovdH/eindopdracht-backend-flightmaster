@@ -1,10 +1,14 @@
 package nl.helicenter.flightmaster.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
 @Entity
+@Getter
+@Setter
 public class Pdf {
 
     @Id
@@ -30,60 +34,4 @@ public class Pdf {
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileExtension() {
-        return fileExtension;
-    }
-
-    public void setFileExtension(String fileExtension) {
-        this.fileExtension = fileExtension;
-    }
-
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
-
-    public long getSizeBytes() {
-        return sizeBytes;
-    }
-
-    public void setSizeBytes(long sizeBytes) {
-        this.sizeBytes = sizeBytes;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
 }

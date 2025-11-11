@@ -48,7 +48,7 @@ public class EventService {
         }
 
         Event event = new Event();
-        event.setDate(dto.getEventDate());
+        event.setEventDate(dto.getEventDate());
         event.setLocation(dto.getLocation());
         event.setFlightTime(dto.getFlightTime());
         event.setStartTime(dto.getStartTime());
@@ -75,7 +75,7 @@ public class EventService {
     private EventResponseDto mapToResponseDto(Event event) {
         EventResponseDto dto = new EventResponseDto();
         dto.setId(event.getId());
-        dto.setEventDate(event.getDate());
+        dto.setEventDate(event.getEventDate());
         dto.setLocation(event.getLocation());
         dto.setFlightTime(event.getFlightTime());
         dto.setStartTime(event.getStartTime());
@@ -93,7 +93,7 @@ public class EventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event " + id + " niet gevonden"));
 
-        applyIfPresent(dto.getEventDate(), event::setDate);
+        applyIfPresent(dto.getEventDate(), event::setEventDate);
         applyIfPresent(dto.getLocation(), event::setLocation);
         applyIfPresent(dto.getFlightTime(), event::setFlightTime);
         applyIfPresent(dto.getStartTime(), event::setStartTime);

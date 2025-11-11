@@ -11,9 +11,7 @@ import org.springframework.core.io.Resource;
 import nl.helicenter.flightmaster.model.UserPhoto;
 import nl.helicenter.flightmaster.repository.FileUploadRepository;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-
 import static nl.helicenter.flightmaster.utils.PatchUtil.applyIfPresent;
 
 @Service

@@ -79,15 +79,15 @@ public class SecurityConfig {
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Publiek
+
                         .requestMatchers("/auth/register", "/auth/login", "/auth/refresh", "/actuator/health", "/error").permitAll()
-                        // Alleen ingelogd
+
                         .requestMatchers(HttpMethod.GET, "/users/{id}", "/events", "/events/{id}", "/passengers/by-user/{userID}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/users/*/photo", "/passengers").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/users/*/photo").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/users/*/photo").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/passengers/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/passengers/{id}").authenticated()
-                        // Admin-rechten only
+
                         .requestMatchers(HttpMethod.POST, "/users/**", "/events/**", "/flights/**", "/helicopters/**", "/passengers/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/**", "/passengers/**", "/flights/**", "/events/**", "/helicopters/**").hasRole("ADMIN")

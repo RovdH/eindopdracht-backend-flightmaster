@@ -8,6 +8,7 @@ import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import static nl.helicenter.flightmaster.utils.PatchUtil.applyIfPresent;
 
 import java.util.List;

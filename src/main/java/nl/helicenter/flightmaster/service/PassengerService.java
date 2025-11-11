@@ -129,9 +129,9 @@ public class PassengerService {
                         "Passenger " + passengerId + " is niet gevonden of bestaat niet"));
 
         applyIfPresent(dto.getFirstName(), passenger::setFirstName);
-        applyIfPresent(dto.getLastName(),  passenger::setLastName);
-        applyIfPresent(dto.getEmail(),     passenger::setEmail);
-        applyIfPresent(dto.getWeightKg(),  passenger::setWeight);
+        applyIfPresent(dto.getLastName(), passenger::setLastName);
+        applyIfPresent(dto.getEmail(), passenger::setEmail);
+        applyIfPresent(dto.getWeightKg(), passenger::setWeight);
 
         Passenger saved = passengerRepository.save(passenger);
         return toResponse(saved);

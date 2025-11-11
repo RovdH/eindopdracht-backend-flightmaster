@@ -60,7 +60,7 @@ public class EventController {
     public ResponseEntity<EventResponseDto> patchEvent(
             @PathVariable Long id,
             @RequestBody EventUpdateDto dto) {
-            eventService.patch(id, dto);
+        eventService.patch(id, dto);
         return ResponseEntity.ok(eventService.getById(id));
     }
 

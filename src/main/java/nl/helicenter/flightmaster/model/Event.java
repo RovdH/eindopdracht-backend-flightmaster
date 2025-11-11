@@ -1,6 +1,8 @@
 package nl.helicenter.flightmaster.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "events")
 public class Event {
 
@@ -29,61 +33,5 @@ public class Event {
     private List<Helicopter> helicopters = new ArrayList<>();
 
     public Event() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDate getDate() {
-        return eventDate;
-    }
-
-    public void setDate(LocalDate eventDate) {
-        this.eventDate = eventDate;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public double getFlightTime() {
-        return flightTime;
-    }
-
-    public void setFlightTime(double flightTime) {
-        this.flightTime = flightTime;
-    }
-
-    public List<Helicopter> getHelicopters() {
-        return helicopters;
-    }
-
-    public void setHelicopters(List<Helicopter> helicopters) {
-        this.helicopters = helicopters;
     }
 }
