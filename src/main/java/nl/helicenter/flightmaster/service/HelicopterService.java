@@ -3,10 +3,12 @@ package nl.helicenter.flightmaster.service;
 import jakarta.persistence.EntityNotFoundException;
 import nl.helicenter.flightmaster.dto.HelicopterRequestDto;
 import nl.helicenter.flightmaster.dto.HelicopterResponseDto;
+import nl.helicenter.flightmaster.dto.HelicopterUpdateDto;
 import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static nl.helicenter.flightmaster.utils.PatchUtil.applyIfPresent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,6 +58,21 @@ public class HelicopterService {
         dto.setFuelUsage(helicopter.getFuelUsage());
         dto.setAvailable(helicopter.isAvailable());
         return dto;
+    }
+
+    @Transactional
+    public Helicopter patch(Long id, HelicopterUpdateDto dto) {
+        Helicopter helicopter = helicopterRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Helicopter " + id + " niet gevonden"));
+
+        applyIfPresent(dto.getCallSign(), helicopter::setCallSign);
+        applyIfPresent(dto.getCapacity(), helicopter::setCapacity);
+        applyIfPresent(dto.getFuelCapacity(), helicopter::setFuelCapacity);
+        applyIfPresent(dto.getType(), helicopter::setType);
+        applyIfPresent(dto.getFuelUsage(), helicopter::setFuelUsage);
+        applyIfPresent(dto.getAvailable(), helicopter::setAvailable);
+
+        return helicopterRepository.save(helicopter);
     }
 
     @Transactional
