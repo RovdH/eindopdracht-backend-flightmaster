@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.Positive;
 import nl.helicenter.flightmaster.dto.EventRequestDto;
 import nl.helicenter.flightmaster.dto.EventResponseDto;
+import nl.helicenter.flightmaster.dto.EventUpdateDto;
+import nl.helicenter.flightmaster.dto.HelicopterUpdateDto;
 import nl.helicenter.flightmaster.model.Event;
 import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.EventRepository;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static nl.helicenter.flightmaster.utils.PatchUtil.applyIfPresent;
 
 @Service
 public class EventService {
@@ -82,6 +86,32 @@ public class EventService {
                         .collect(Collectors.toList())
         );
         return dto;
+    }
+
+    @Transactional
+    public Event patch(Long id, EventUpdateDto dto) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Event " + id + " niet gevonden"));
+
+        applyIfPresent(dto.getEventDate(), event::setDate);
+        applyIfPresent(dto.getLocation(), event::setLocation);
+        applyIfPresent(dto.getFlightTime(), event::setFlightTime);
+        applyIfPresent(dto.getStartTime(), event::setStartTime);
+        applyIfPresent(dto.getEndTime(), event::setEndTime);
+
+        applyIfPresent(dto.getHelicopterIds(), ids -> {
+            List<Helicopter> helicopters = helicopterRepository.findAllById(ids);
+            if (helicopters.size() != ids.size()) {
+                throw new EntityNotFoundException("Een of meer helikopters niet gevonden voor ids: " + ids);
+            }
+            event.setHelicopters(helicopters);
+        });
+
+        if (event.getStartTime() != null && event.getEndTime() != null
+                && !event.getEndTime().isAfter(event.getStartTime())) {
+            throw new IllegalArgumentException("Eindtijd moet later zijn dan starttijd");
+        }
+        return eventRepository.save(event);
     }
 
     @Transactional

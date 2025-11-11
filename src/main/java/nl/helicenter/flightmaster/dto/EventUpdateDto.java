@@ -1,7 +1,8 @@
 package nl.helicenter.flightmaster.dto;
-
-import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,27 +10,25 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-@Getter
 @Setter
-public class EventRequestDto {
+@Getter
+public class EventUpdateDto {
 
-    @NotNull(message = "Datum van het event is verplicht")
     @FutureOrPresent(message = "Datum mag niet in het verleden liggen")
     private LocalDate eventDate;
 
-    @NotBlank(message = "Locatie is verplicht")
     private String location;
 
     @Positive(message = "Vliegtijd moet groter zijn dan 0")
-    private double flightTime;
+    private Double flightTime;
 
     @JsonFormat(pattern = "HH:mm")
-    @NotNull(message = "Starttijd is verplicht en moet in HH:mm formaat zijn")
     private LocalTime startTime;
 
     @JsonFormat(pattern = "HH:mm")
-    @NotNull(message = "Eindtijd is verplicht en moet in HH:mm formaat zijn")
     private LocalTime endTime;
+
+    private List<@Positive Long> helicopterIds;
 
     @AssertTrue(message = "Eindtijd moet later zijn dan starttijd")
     public boolean isValidTimeWindow() {
@@ -38,8 +37,4 @@ public class EventRequestDto {
         }
         return endTime.isAfter(startTime);
     }
-
-    @NotEmpty(message = "Minimaal één helikopter is vereist")
-    private List<@Positive Long> helicopterIds;
-
 }

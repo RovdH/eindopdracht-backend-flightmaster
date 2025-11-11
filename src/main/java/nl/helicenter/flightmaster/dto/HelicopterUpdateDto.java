@@ -1,6 +1,4 @@
 package nl.helicenter.flightmaster.dto;
-
-
 import lombok.Getter;
 import lombok.Setter;
 

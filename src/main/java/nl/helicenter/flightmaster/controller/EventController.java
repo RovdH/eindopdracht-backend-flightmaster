@@ -2,9 +2,9 @@ package nl.helicenter.flightmaster.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import nl.helicenter.flightmaster.dto.EventRequestDto;
-import nl.helicenter.flightmaster.dto.EventResponseDto;
-import nl.helicenter.flightmaster.dto.FlightResponseDto;
+import nl.helicenter.flightmaster.dto.*;
+import nl.helicenter.flightmaster.model.Event;
+import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.service.EventService;
 import nl.helicenter.flightmaster.service.FlightService;
 import org.springframework.http.HttpStatus;
@@ -54,6 +54,14 @@ public class EventController {
     @GetMapping("/{eventId}/flights")
     public ResponseEntity<List<FlightResponseDto>> getEventFlights(@PathVariable @Positive Long eventId) {
         return ResponseEntity.ok(flightService.getByEvent(eventId));
+    }
+
+    @PatchMapping("update/{id}")
+    public ResponseEntity<EventResponseDto> patchEvent(
+            @PathVariable Long id,
+            @RequestBody EventUpdateDto dto) {
+            eventService.patch(id, dto);
+        return ResponseEntity.ok(eventService.getById(id));
     }
 
     @DeleteMapping("/{id}")
