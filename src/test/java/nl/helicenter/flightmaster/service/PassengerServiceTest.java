@@ -24,11 +24,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PassengerServiceTest {
 
-    @Mock PassengerRepository passengerRepository;
-    @Mock FlightRepository flightRepository;
-    @Mock UserRepository userRepository;
+    @Mock
+    PassengerRepository passengerRepository;
+    @Mock
+    FlightRepository flightRepository;
+    @Mock
+    UserRepository userRepository;
 
-    @InjectMocks PassengerService passengerService;
+    @InjectMocks
+    PassengerService passengerService;
 
 
     @Test
@@ -191,13 +195,17 @@ class PassengerServiceTest {
         dto1.setFlightId(10L);
         dto1.setUserId(1L);
         dto1.setWeightKg(80.0);
-        dto1.setFirstName("Robert-Jan"); dto1.setLastName("Elias"); dto1.setEmail("backend@novi.nl");
+        dto1.setFirstName("Robert-Jan");
+        dto1.setLastName("Elias");
+        dto1.setEmail("backend@novi.nl");
 
         PassengerRequestDto dto2 = new PassengerRequestDto();
         dto2.setFlightId(10L);
         dto2.setUserId(2L);
         dto2.setWeightKg(81.0);
-        dto2.setFirstName("Carlijn"); dto2.setLastName("Dirksen"); dto2.setEmail("cd@email.nl");
+        dto2.setFirstName("Carlijn");
+        dto2.setLastName("Dirksen");
+        dto2.setEmail("cd@email.nl");
 
         Helicopter heli = new Helicopter();
         heli.setCapacity(2);
@@ -221,7 +229,9 @@ class PassengerServiceTest {
         dto1.setFlightId(10L);
         dto1.setUserId(1L);
         dto1.setWeightKg(80.0);
-        dto1.setFirstName("Albert"); dto1.setLastName("Kuip"); dto1.setEmail("ak@planet.nl");
+        dto1.setFirstName("Albert");
+        dto1.setLastName("Kuip");
+        dto1.setEmail("ak@planet.nl");
 
         Helicopter heli = new Helicopter();
         heli.setCapacity(3);
@@ -242,35 +252,55 @@ class PassengerServiceTest {
     @Test
     void createBulk_happyPath_mapsAllAndReturnsDtos() {
         PassengerRequestDto dto1 = new PassengerRequestDto();
-        dto1.setFlightId(10L); dto1.setUserId(1L); dto1.setWeightKg(70.0);
-        dto1.setFirstName("Albert"); dto1.setLastName("Kuip"); dto1.setEmail("ak@planet.nl");
+        dto1.setFlightId(10L);
+        dto1.setUserId(1L);
+        dto1.setWeightKg(70.0);
+        dto1.setFirstName("Albert");
+        dto1.setLastName("Kuip");
+        dto1.setEmail("ak@planet.nl");
 
         PassengerRequestDto dto2 = new PassengerRequestDto();
-        dto2.setFlightId(10L); dto2.setUserId(2L); dto2.setWeightKg(71.0);
-        dto2.setFirstName("Carlijn"); dto2.setLastName("Dirksen"); dto2.setEmail("cd@email.nl");
+        dto2.setFlightId(10L);
+        dto2.setUserId(2L);
+        dto2.setWeightKg(71.0);
+        dto2.setFirstName("Carlijn");
+        dto2.setLastName("Dirksen");
+        dto2.setEmail("cd@email.nl");
 
         PassengerRequestDto dto3 = new PassengerRequestDto();
-        dto3.setFlightId(11L); dto3.setUserId(3L); dto3.setWeightKg(72.0);
-        dto3.setFirstName("Jan"); dto3.setLastName("Jansen"); dto3.setEmail("jj@ziggo.nl");
+        dto3.setFlightId(11L);
+        dto3.setUserId(3L);
+        dto3.setWeightKg(72.0);
+        dto3.setFirstName("Jan");
+        dto3.setLastName("Jansen");
+        dto3.setEmail("jj@ziggo.nl");
 
         Helicopter heli1 = new Helicopter();
         heli1.setCapacity(5);
         Flight fl10 = new Flight();
-        fl10.setId(10L); fl10.setHelicopter(heli1);
+        fl10.setId(10L);
+        fl10.setHelicopter(heli1);
 
         Helicopter heli2 = new Helicopter();
         heli2.setCapacity(5);
         Flight fl20 = new Flight();
-        fl20.setId(11L); fl20.setHelicopter(heli2);
+        fl20.setId(11L);
+        fl20.setHelicopter(heli2);
 
         when(flightRepository.findAllById(Set.of(10L, 11L))).thenReturn(List.of(fl10, fl20));
         when(passengerRepository.countByFlight_Id(10L)).thenReturn(1L);
         when(passengerRepository.countByFlight_Id(11L)).thenReturn(0L);
 
-        User u1 = new User(); u1.setId(1L); u1.setEmail("u1@voorbeeld.nl");
-        User u2 = new User(); u2.setId(2L); u2.setEmail("u2@voorbeeld.nl");
-        User u3 = new User(); u3.setId(3L); u3.setEmail("u3@voorbeeld.nl");
-        when(userRepository.findAllById(Set.of(1L,2L,3L))).thenReturn(List.of(u1,u2,u3));
+        User u1 = new User();
+        u1.setId(1L);
+        u1.setEmail("u1@voorbeeld.nl");
+        User u2 = new User();
+        u2.setId(2L);
+        u2.setEmail("u2@voorbeeld.nl");
+        User u3 = new User();
+        u3.setId(3L);
+        u3.setEmail("u3@voorbeeld.nl");
+        when(userRepository.findAllById(Set.of(1L, 2L, 3L))).thenReturn(List.of(u1, u2, u3));
 
         when(passengerRepository.saveAll(anyList())).thenAnswer(inv -> {
             @SuppressWarnings("unchecked")
@@ -284,20 +314,24 @@ class PassengerServiceTest {
 
         assertThat(result).hasSize(3);
         assertThat(result).extracting(PassengerResponseDto::getEmail)
-                .containsExactlyInAnyOrder("ak@planet.nl","cd@email.nl","jj@ziggo.nl");
+                .containsExactlyInAnyOrder("ak@planet.nl", "cd@email.nl", "jj@ziggo.nl");
         assertThat(result).extracting(PassengerResponseDto::getFlightId)
-                .containsExactlyInAnyOrder(10L,10L,11L);
+                .containsExactlyInAnyOrder(10L, 10L, 11L);
         assertThat(result).extracting(PassengerResponseDto::getUserId)
-                .containsExactlyInAnyOrder(1L,2L,3L);
+                .containsExactlyInAnyOrder(1L, 2L, 3L);
         assertThat(result).extracting(PassengerResponseDto::getId)
-                .containsExactlyInAnyOrder(100L,101L,102L);
+                .containsExactlyInAnyOrder(100L, 101L, 102L);
     }
 
     @Test
     void getById_found_returnsDto() {
-        Helicopter heli = new Helicopter(); heli.setCapacity(3);
-        Flight flight = new Flight(); flight.setId(9L); flight.setHelicopter(heli);
-        User user = new User(); user.setId(5L);
+        Helicopter heli = new Helicopter();
+        heli.setCapacity(3);
+        Flight flight = new Flight();
+        flight.setId(9L);
+        flight.setHelicopter(heli);
+        User user = new User();
+        user.setId(5L);
 
         Passenger p = new Passenger();
         p.setId(77L);
@@ -344,17 +378,31 @@ class PassengerServiceTest {
 
     @Test
     void listByFlight_mapsAll() {
-        Helicopter heli = new Helicopter(); heli.setCapacity(4);
-        Flight flight = new Flight(); flight.setId(77L); flight.setHelicopter(heli);
-        User user = new User(); user.setId(9L);
+        Helicopter heli = new Helicopter();
+        heli.setCapacity(4);
+        Flight flight = new Flight();
+        flight.setId(77L);
+        flight.setHelicopter(heli);
+        User user = new User();
+        user.setId(9L);
 
         Passenger p1 = new Passenger();
-        p1.setId(1L); p1.setFirstName("Ali"); p1.setLastName("Jansen"); p1.setEmail("aj@ziggo.nl"); p1.setWeight(60.0);
-        p1.setFlight(flight); p1.setUser(user);
+        p1.setId(1L);
+        p1.setFirstName("Ali");
+        p1.setLastName("Jansen");
+        p1.setEmail("aj@ziggo.nl");
+        p1.setWeight(60.0);
+        p1.setFlight(flight);
+        p1.setUser(user);
 
         Passenger p2 = new Passenger();
-        p2.setId(2L); p2.setFirstName("Carlijn"); p2.setLastName("Dirksen"); p2.setEmail("cd@email.nl"); p2.setWeight(61.0);
-        p2.setFlight(flight); p2.setUser(user);
+        p2.setId(2L);
+        p2.setFirstName("Carlijn");
+        p2.setLastName("Dirksen");
+        p2.setEmail("cd@email.nl");
+        p2.setWeight(61.0);
+        p2.setFlight(flight);
+        p2.setUser(user);
 
         when(passengerRepository.findAllByFlight_Id(77L)).thenReturn(List.of(p1, p2));
 
@@ -368,17 +416,31 @@ class PassengerServiceTest {
 
     @Test
     void listByUser_mapsAll() {
-        Helicopter heli = new Helicopter(); heli.setCapacity(4);
-        Flight flight = new Flight(); flight.setId(88L); flight.setHelicopter(heli);
-        User user = new User(); user.setId(10L);
+        Helicopter heli = new Helicopter();
+        heli.setCapacity(4);
+        Flight flight = new Flight();
+        flight.setId(88L);
+        flight.setHelicopter(heli);
+        User user = new User();
+        user.setId(10L);
 
         Passenger p1 = new Passenger();
-        p1.setId(3L); p1.setFirstName("Jan"); p1.setLastName("Jansen"); p1.setEmail("jj@ziggo.nl"); p1.setWeight(62.0);
-        p1.setFlight(flight); p1.setUser(user);
+        p1.setId(3L);
+        p1.setFirstName("Jan");
+        p1.setLastName("Jansen");
+        p1.setEmail("jj@ziggo.nl");
+        p1.setWeight(62.0);
+        p1.setFlight(flight);
+        p1.setUser(user);
 
         Passenger p2 = new Passenger();
-        p2.setId(4L); p2.setFirstName("Gerda"); p2.setLastName("Hurk"); p2.setEmail("gh@ziggo.nl"); p2.setWeight(63.0);
-        p2.setFlight(flight); p2.setUser(user);
+        p2.setId(4L);
+        p2.setFirstName("Gerda");
+        p2.setLastName("Hurk");
+        p2.setEmail("gh@ziggo.nl");
+        p2.setWeight(63.0);
+        p2.setFlight(flight);
+        p2.setUser(user);
 
         when(passengerRepository.findAllByUser_Id(10L)).thenReturn(List.of(p1, p2));
 
