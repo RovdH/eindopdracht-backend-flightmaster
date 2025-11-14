@@ -126,8 +126,8 @@ public class FlightService {
             return Optional.empty();
         }
 
-        long idx = flightRepository.countByEvent_Id(event.getId()) + 1;
-        String flightNumber = "FL" + idx;
+        long flightId = flightRepository.countByEvent_Id(event.getId()) + 1;
+        String flightNumber = "E" + event.getId() + "-F" + flightId;
 
         Flight flight = new Flight();
         flight.setEvent(event);
