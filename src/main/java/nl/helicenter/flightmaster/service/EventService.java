@@ -2,14 +2,13 @@ package nl.helicenter.flightmaster.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.Positive;
-import nl.helicenter.flightmaster.dto.EventRequestDto;
-import nl.helicenter.flightmaster.dto.EventResponseDto;
-import nl.helicenter.flightmaster.dto.EventUpdateDto;
-import nl.helicenter.flightmaster.dto.HelicopterUpdateDto;
+import nl.helicenter.flightmaster.dto.*;
 import nl.helicenter.flightmaster.model.Event;
 import nl.helicenter.flightmaster.model.Helicopter;
 import nl.helicenter.flightmaster.repository.EventRepository;
+import nl.helicenter.flightmaster.repository.FlightRepository;
 import nl.helicenter.flightmaster.repository.HelicopterRepository;
+import nl.helicenter.flightmaster.repository.PassengerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +26,14 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final HelicopterRepository helicopterRepository;
+    private final FlightRepository flightRepository;
+    private final FlightService flightService;
 
-    public EventService(EventRepository eventRepository, HelicopterRepository helicopterRepository) {
+    public EventService(EventRepository eventRepository, HelicopterRepository helicopterRepository, FlightRepository flightRepository,  FlightService flightService) {
         this.eventRepository = eventRepository;
         this.helicopterRepository = helicopterRepository;
+        this.flightRepository = flightRepository;
+        this.flightService = flightService;
     }
 
     public EventResponseDto createEvent(EventRequestDto dto) {
@@ -117,8 +120,16 @@ public class EventService {
     @Transactional
     public void delete(Long id) {
         if (!eventRepository.existsById(id)) {
-            throw new EntityNotFoundException("Event with id" + id + " not found");
+            throw new EntityNotFoundException("Event with id " + id + " not found");
         }
+        List<FlightResponseDto> flights = flightService.getByEvent(id);
+        boolean hasBookedSeats = flights.stream()
+                .anyMatch(flight -> flight.getSeatsBooked() > 0);
+        if (hasBookedSeats) {
+            throw new IllegalStateException("Kan event niet verwijderen omdat er passagiers geboekt staan.");
+        }
+
+        flightRepository.deleteByEvent_Id(id);
         eventRepository.deleteById(id);
     }
 }
