@@ -94,7 +94,7 @@ public class EventService {
     @Transactional
     public Event patch(Long id, EventUpdateDto dto) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event " + id + " niet gevonden"));
+                .orElseThrow(() -> new EntityNotFoundException("Event met id " + id + " niet gevonden"));
 
         applyIfPresent(dto.getEventDate(), event::setEventDate);
         applyIfPresent(dto.getLocation(), event::setLocation);
@@ -120,7 +120,7 @@ public class EventService {
     @Transactional
     public void delete(Long id) {
         if (!eventRepository.existsById(id)) {
-            throw new EntityNotFoundException("Event with id " + id + " not found");
+            throw new EntityNotFoundException("Event met id " + id + " niet gevonden");
         }
         List<FlightResponseDto> flights = flightService.getByEvent(id);
         boolean hasBookedSeats = flights.stream()
