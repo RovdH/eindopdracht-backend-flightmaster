@@ -6,6 +6,7 @@ import nl.helicenter.flightmaster.dto.UserUpdateDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.model.UserPhoto;
 import nl.helicenter.flightmaster.repository.FileUploadRepository;
+import nl.helicenter.flightmaster.repository.PassengerRepository;
 import nl.helicenter.flightmaster.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,8 @@ class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+    @Mock
+    private PassengerRepository passengerRepository;
     @Mock
     PasswordEncoder passwordEncoder;
     @Mock
@@ -283,6 +286,26 @@ class UserServiceTest {
     }
 
     @Test
+    void patch_emailChange() {
+        User user = new User();
+        user.setId(10L);
+        user.setEmail("oudemail@home.nl");
+
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("nieuwemail@planet.nl")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setEmail("nieuwemail@planet.nl");
+
+        User saved = userService.patch(10L, dto);
+
+        assertThat(saved.getEmail()).isEqualTo("nieuwemail@planet.nl");
+        verify(userRepository).existsByEmail("nieuwemail@planet.nl");
+        verify(userRepository).save(user);
+    }
+
+    @Test
     void deletePhotoFromUser_noPhoto_noop() {
         User user = new User();
         user.setId(2L);
@@ -320,8 +343,21 @@ class UserServiceTest {
     @Test
     void delete_userExists() {
         when(userRepository.existsById(1L)).thenReturn(true);
+        when(passengerRepository.existsByUser_Id(1L)).thenReturn(false);
         userService.delete(1L);
         verify(userRepository).deleteById(1L);
+    }
+
+    @Test
+    void delete_userHasPassengersRelation() {
+        when(userRepository.existsById(5L)).thenReturn(true);
+        when(passengerRepository.existsByUser_Id(5L)).thenReturn(true);
+
+        assertThatThrownBy(() -> userService.delete(5L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Kan gebruiker niet verwijderen");
+
+        verify(userRepository, never()).deleteById(any());
     }
 
     @Test
