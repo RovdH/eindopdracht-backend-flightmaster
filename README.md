@@ -33,7 +33,7 @@ De applicatie vormt de backend van een boekingssysteem waarbij gebruikers zich k
 De applicatie is opgebouwd volgens de **MVC-architectuur** van Spring Boot en maakt gebruik van Controllers voor de endpoints, DTO’s om data te valideren en vervuiling van de database te voorkomen, Services waar de business logica te vinden is en Repositories voor de communicatie naar de database.
 
 ### Gebruikte technieken
-- **Java 17 LTS**
+- **Java 21 LTS**
 - **JDK Coretto 21**
 - **Spring Boot 3.x**
 - **Spring Web / JPA / Security / Validation**
