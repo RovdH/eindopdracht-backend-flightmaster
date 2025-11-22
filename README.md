@@ -168,14 +168,14 @@ Autorisatie is geregeld via **JWT-tokens**:
 
 ---
 ## Default Gebruikers
-Bij het opstarten van de applicatie wordt er automatisch een default Admin toegevoegd om de applicatie te kunnen gebruiken:
+Bij het opstarten van de applicatie worden er automatisch default gebruikers toegevoegd om de applicatie te kunnen gebruiken. Waaronder ook de default ADMIN:
 
 | Gebruiker | Wachtwoord | Rol  | Toegang |
 |------------|-------------|------|----------|
 | `admin@flightmaster.nl` | `Geheim123!` | ADMIN | Alle endpoints |
 
 **Let op:** Verwijder na eerste startup de Admin insert regels uit data.sql of pas het wachtwoord aan.
-Voeg eerst een extra Admin aan Flight Master toe met eigen credentials. Delete daarna de Default Admin en het data.sql bestand uit de repository.
+Voeg eerst een extra Admin aan Flight Master toe met eigen credentials. Delete daarna de Default Admin en het data.sql bestand uit de repository wanneer je geen gebruik van de default data wilt gebruiken.
 
 ---
 
