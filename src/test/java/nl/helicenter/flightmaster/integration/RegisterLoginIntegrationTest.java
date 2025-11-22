@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+
 class RegisterLoginIntegrationTest {
 
     @Autowired
@@ -34,7 +35,8 @@ class RegisterLoginIntegrationTest {
                                   {"email":"%s","password":"%s"}
                                 """.formatted(email, password)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
+                .andExpect(header().string("Location", startsWith("/users/")))
+                .andExpect(jsonPath("$['Gebruiker is geregistreerd met id']", notNullValue()))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
 

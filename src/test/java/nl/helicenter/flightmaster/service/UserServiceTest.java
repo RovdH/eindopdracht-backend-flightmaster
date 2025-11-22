@@ -2,6 +2,7 @@ package nl.helicenter.flightmaster.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
+import nl.helicenter.flightmaster.dto.UserUpdateDto;
 import nl.helicenter.flightmaster.model.User;
 import nl.helicenter.flightmaster.model.UserPhoto;
 import nl.helicenter.flightmaster.repository.FileUploadRepository;
@@ -13,10 +14,8 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -155,6 +154,132 @@ class UserServiceTest {
         Resource res = userService.getPhotoFromUser(id);
         assertThat(res).isSameAs(mockRes);
         verify(userPhotoService).downLoadFile(fileName);
+    }
+
+    @Test
+    void patch_userNotFound_throws() {
+        when(userRepository.findById(123L)).thenReturn(Optional.empty());
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setEmail("nieuw@voorbeeld.nl");
+
+        assertThatThrownBy(() -> userService.patch(123L, dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("User 123 niet gevonden");
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void patch_emailSame_noValidation_andSave() {
+        User user = new User();
+        user.setId(5L);
+        user.setEmail("Barry@voorbeeld.nl");
+        user.setPassword("HASH");
+        user.setRole("USER");
+
+        when(userRepository.findById(5L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setEmail("Barry@voorbeeld.nl");
+
+        User saved = userService.patch(5L, dto);
+
+        assertThat(saved.getEmail()).isEqualTo("Barry@voorbeeld.nl");
+        verify(userRepository, never()).existsByEmail(anyString());
+        verify(userRepository).save(user);
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void patch_emailTaken_throws() {
+        User user = new User();
+        user.setId(6L);
+        user.setEmail("Henk@oudemail.nl");
+        when(userRepository.findById(6L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("Henk@nieuwemail.nl")).thenReturn(true);
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setEmail("Henk@nieuwemail.nl");
+
+        assertThatThrownBy(() -> userService.patch(6L, dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("E-mailadres is al in gebruik.");
+
+        verify(userRepository, never()).save(any());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void patch_password_encode_save() {
+        User user = new User();
+        user.setId(7L);
+        user.setEmail("Henk@voorbeeld.nl");
+        user.setPassword("OLDHASH");
+        user.setRole("USER");
+
+        when(userRepository.findById(7L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode("ReteSterkWW2019!")).thenReturn("ENCODED");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setPassword("ReteSterkWW2019!");
+
+        User saved = userService.patch(7L, dto);
+
+        assertThat(saved.getPassword()).isEqualTo("ENCODED");
+        verify(passwordEncoder).encode("ReteSterkWW2019!");
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void patch_passwordBlank() {
+        User user = new User();
+        user.setId(8L);
+        user.setEmail("Freek@voorbeeld.nl");
+        user.setPassword("OLDHASH");
+
+        when(userRepository.findById(8L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setPassword("   ");
+
+        User saved = userService.patch(8L, dto);
+
+        assertThat(saved.getPassword()).isEqualTo("OLDHASH");
+        verify(passwordEncoder, never()).encode(any());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void patch_roleProvided_updatesRole() {
+        User user = new User();
+        user.setId(9L);
+        user.setEmail("Freek@voorbeeld.nl");
+        user.setPassword("HASH");
+        user.setRole("USER");
+
+        when(userRepository.findById(9L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setRole("ADMIN");
+
+        User saved = userService.patch(9L, dto);
+
+        assertThat(saved.getRole()).isEqualTo("ADMIN");
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void assignPhotoToUser_userNotFound() {
+        when(userRepository.findById(42L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.assignPhotoToUser("foto.png", 42L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("User 42 niet gevonden");
+        verify(fileUploadRepository, never()).save(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test

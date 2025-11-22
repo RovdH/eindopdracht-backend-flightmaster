@@ -126,8 +126,8 @@ public class FlightService {
             return Optional.empty();
         }
 
-        long idx = flightRepository.countByEvent_Id(event.getId()) + 1;
-        String flightNumber = "FL" + idx;
+        long flightId = flightRepository.countByEvent_Id(event.getId()) + 1;
+        String flightNumber = "E" + event.getId() + "-F" + flightId;
 
         Flight flight = new Flight();
         flight.setEvent(event);
@@ -142,10 +142,13 @@ public class FlightService {
 
     @Transactional
     public void delete(Long id) {
-        if (!flightRepository.existsById(id)) {
-            throw new EntityNotFoundException("Flight with id" + id + " not found");
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Flight " + id + " not found"));
+        FlightResponseDto dto = mapToResponse(flight);
+        if (dto.getSeatsBooked() > 0) {
+            throw new IllegalStateException("Kan vlucht niet verwijderen omdat er passagiers geboekt staan.");
         }
-        flightRepository.deleteById(id);
+        flightRepository.delete(flight);
     }
 
     private FlightResponseDto mapToResponse(Flight flight) {
@@ -159,34 +162,12 @@ public class FlightService {
         dto.setStartTime(flight.getStartTime());
         dto.setEndTime(flight.getStartTime().plusMinutes((long) flight.getEvent().getFlightTime()));
         dto.setEventId(flight.getEvent().getId());
-
         dto.setCapacityTotal(capacityTotal);
         dto.setSeatsBooked(seatsBooked);
         dto.setSeatsAvailable(seatsAvailable);
-
         dto.setHelicopterCallSign(flight.getHelicopter().getCallSign());
         dto.setFuelBefore(flight.getFuelBefore());
         dto.setFuelAfter(flight.getFuelAfter());
         return dto;
-    }
-
-
-    public List<FlightResponseDto> listByEvent(Long eventId) {
-        List<Flight> flights = flightRepository.findByEvent_Id(eventId);
-        return flights.stream().map(flight -> {
-            int capacityTotal = flight.getHelicopter().getCapacity();
-            long booked = passengerRepository.countByFlight_Id(flight.getId());
-            int seatsAvailable = Math.max(0, capacityTotal - (int) booked);
-
-            FlightResponseDto dto = new FlightResponseDto();
-            dto.setId(flight.getId());
-            dto.setFlightNumber(flight.getFlightNumber());
-            dto.setStartTime(flight.getStartTime());
-            dto.setCapacityTotal(capacityTotal);
-            dto.setSeatsBooked(booked);
-            dto.setSeatsAvailable(seatsAvailable);
-            dto.setHelicopterCallSign(flight.getHelicopter().getCallSign());
-            return dto;
-        }).toList();
     }
 }

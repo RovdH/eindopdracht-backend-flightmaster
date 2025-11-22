@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,7 +35,7 @@ public class UsersEndpointAuthIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", matchesPattern("/users/\\d+")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$['Gebruiker is geregistreerd met id']", notNullValue()))
                 .andReturn();
     }
 

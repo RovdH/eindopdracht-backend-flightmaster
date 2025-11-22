@@ -159,6 +159,14 @@ public class PdfService {
         return pdfRepository.findByEventId(eventId).stream().map(this::toDto).toList();
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Pdf pdf = pdfRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("PDF " + id + " niet gevonden"));
+
+        pdfRepository.delete(pdf);
+    }
+
     private PdfResponseDto toDto(Pdf d) {
         PdfResponseDto dto = new PdfResponseDto();
         dto.setId(d.getId());

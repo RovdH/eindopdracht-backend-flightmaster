@@ -3,6 +3,7 @@ package nl.helicenter.flightmaster.service;
 import nl.helicenter.flightmaster.dto.UserRequestDto;
 import nl.helicenter.flightmaster.dto.UserUpdateDto;
 import nl.helicenter.flightmaster.model.User;
+import nl.helicenter.flightmaster.repository.PassengerRepository;
 import nl.helicenter.flightmaster.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,14 @@ public class UserService {
     private final FileUploadRepository fileUploadRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserPhotoService userPhotoService;
+    private final PassengerRepository passengerRepository;
 
-    public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, FileUploadRepository fileUploadRepository, UserPhotoService userPhotoService, PasswordEncoder passwordEncoder, PassengerRepository passengerRepository) {
         this.userRepository = userRepository;
         this.userPhotoService = userPhotoService;
         this.fileUploadRepository = fileUploadRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passengerRepository = passengerRepository;
     }
 
     public Long registerUser(UserRequestDto dto) {
@@ -101,11 +104,17 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException("User " + userId + " not found");
+    public void delete(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("User " + id + " niet gevonden");
         }
-        userRepository.deleteById(userId);
+        boolean hasPassengers = passengerRepository.existsByUser_Id(id);
+        if (hasPassengers) {
+            throw new IllegalStateException(
+                    "Kan gebruiker niet verwijderen omdat er nog passagiers aan deze gebruiker gekoppeld zijn."
+            );
+        }
+        userRepository.deleteById(id);
     }
 
 }

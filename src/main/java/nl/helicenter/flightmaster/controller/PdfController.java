@@ -48,4 +48,10 @@ public class PdfController {
                 .contentLength(bytes.length)
                 .body(bytes);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable @Positive Long id) {
+        pdfService.delete(id);
+        return ResponseEntity.noContent().build(); // 204
+    }
 }

@@ -118,7 +118,7 @@ public class PassengerService {
     @Transactional(readOnly = true)
     public PassengerResponseDto getById(Long passengerId) {
         Passenger passenger = passengerRepository.findById(passengerId)
-                .orElseThrow(() -> new EntityNotFoundException("Passenger " + passengerId + "is niet gevonden of bestaat niet"));
+                .orElseThrow(() -> new EntityNotFoundException("Passenger " + passengerId + " is niet gevonden of bestaat niet"));
         return toResponse(passenger);
     }
 

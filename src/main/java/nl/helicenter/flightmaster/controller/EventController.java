@@ -9,6 +9,7 @@ import nl.helicenter.flightmaster.service.EventService;
 import nl.helicenter.flightmaster.service.FlightService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @Transactional
     @PostMapping("/{id}/flights/generate")
     public ResponseEntity<List<FlightResponseDto>> generate(
             @PathVariable("id") @Positive Long eventId,
@@ -59,7 +61,7 @@ public class EventController {
     @PatchMapping("update/{id}")
     public ResponseEntity<EventResponseDto> patchEvent(
             @PathVariable Long id,
-            @RequestBody EventUpdateDto dto) {
+            @RequestBody @Valid EventUpdateDto dto) {
         eventService.patch(id, dto);
         return ResponseEntity.ok(eventService.getById(id));
     }
